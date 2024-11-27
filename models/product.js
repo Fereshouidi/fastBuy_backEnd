@@ -28,6 +28,10 @@ const ProductShema = new mongoose.Schema({
         type: [mongoose.Schema.Types.ObjectId],
         req: 'customers',
     },
+    reviews: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'reviews'
+    },
     createdAt: {
         type: Date,
     }
