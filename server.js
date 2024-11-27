@@ -9,6 +9,10 @@ const shoppingCartRouter = require('./routes/shoppingCart');
 
 const PORT = 3002 || process.env.PORT;
 
+app.get('/', (req, res) => {
+    res.send('Server is running!');
+});
+
 app.use(cors());
 app.use(express.json());
 
