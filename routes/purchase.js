@@ -48,6 +48,15 @@ router.post('/add/purchase', async(req, res) => {
     }
 })
 
+router.get('/get/allPurchases', async(req, res) => {
+    try{
+        const allPurchases = await Purchase.find();
+        res.status(200).json(allPurchases);
+    }catch{
+        res.status(500).json({error: err});
+    }
+})
+
 
 
 

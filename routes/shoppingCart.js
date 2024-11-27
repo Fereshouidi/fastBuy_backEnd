@@ -67,5 +67,13 @@ router.put('/update/shoppingCart/status', async(req, res) => {
     }
 })
 
+router.get('/get/allShoppingCarts', async(req, res) => {
+    try{
+        const allShoppingCarts = await ShoppingCart.find();
+        res.status(200).json(allShoppingCarts);
+    }catch{
+        res.status(500).json({error: err});
+    }
+})
 
 module.exports = router;
