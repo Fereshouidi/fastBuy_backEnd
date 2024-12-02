@@ -11,7 +11,7 @@ const sliderRouter = require('./routes/slider');
 
 const PORT = 3002 || process.env.PORT;
 
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
     res.send('Server is running!');
 });
 
