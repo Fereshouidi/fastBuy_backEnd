@@ -20,6 +20,21 @@ const ProductShema = new mongoose.Schema({
     images: {
         type: [],
     },
+    imagePrincipal: {
+        type: String,
+    },
+    discount: {
+        type: Number,
+    },
+    discountSticker: {
+        type: String,
+    },
+    startOfDiscount: {
+        type: Date,
+    },
+    endOfDiscount: {
+        type: Date,
+    },
     inPurchases: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'purchases',
@@ -31,6 +46,10 @@ const ProductShema = new mongoose.Schema({
     reviews: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'reviews'
+    },
+    totalRating: {
+        type: Number,
+        unum: [0,1,2,3,4,5],
     },
     createdAt: {
         type: Date,

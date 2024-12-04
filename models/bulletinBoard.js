@@ -7,6 +7,9 @@ const BullentinBoardShema = new mongoose.Schema({
     changingTime: {
         type: Number,
     },
+    link: {
+        type: String,
+    },
     createdAt: {
         type: Date,
         default: Date.now,
