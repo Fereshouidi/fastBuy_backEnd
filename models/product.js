@@ -11,6 +11,9 @@ const ProductShema = new mongoose.Schema({
     price: {
         type: Number,
     },
+    currencyType: {
+        type: String,
+    },
     quantity: {
         type: Number,
     },
@@ -24,16 +27,8 @@ const ProductShema = new mongoose.Schema({
         type: String,
     },
     discount: {
-        type: Number,
-    },
-    discountSticker: {
-        type: String,
-    },
-    startOfDiscount: {
-        type: Date,
-    },
-    endOfDiscount: {
-        type: Date,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'discounts',
     },
     inPurchases: {
         type: [mongoose.Schema.Types.ObjectId],
