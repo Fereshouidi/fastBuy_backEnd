@@ -44,8 +44,10 @@ router.get('/get/product/byId/:id', async(req, res) => {
 })
 
 router.get('/get/products/byRating', async (req, res) => {
+    const {page, limit} = req.query;
+    const skip = (page - 1) * limit;
     try {
-        const allProducts = await Product.find().sort({ totalRating: -1 });
+        const allProducts = await Product.find().sort({ totalRating: -1 }).limit(parseInt(limit)).skip(parseInt(skip));
 
         const productIds = allProducts.map(product => product._id);
 
@@ -69,6 +71,30 @@ router.get('/get/products/byRating', async (req, res) => {
     }
 });
 
+router.put('/update/product/categorie', async(req, res) => {
+    const {productId, categorieId} = req.body;
+
+    if(!productId){
+        return res.status(404).json({error: 'product id is required !'});
+    }
+
+    if (!categorieId) {
+        return res.status(404).json({ error: 'categorie not found !' });
+    }
+
+    try{
+        const updatedProduct = await Product.findByIdAndUpdate({_id: productId}, {categorie: categorieId}, {new: true});
+
+        if(!updatedProduct){
+            return res.status(404).json({ error: 'cannot find that product!' });
+        }
+
+        res.status(200).json({ message: 'Price updated successfully!', product: updatedProduct });
+        
+    }catch(err){
+        res.status(500).json({error: err});
+    }
+})
 
 
 router.put('/update/product/price', async(req, res) => {

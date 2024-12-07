@@ -17,8 +17,9 @@ const ProductShema = new mongoose.Schema({
     quantity: {
         type: Number,
     },
-    category: {
-        type: Number,
+    categorie: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'categories',
     },
     images: {
         type: [],

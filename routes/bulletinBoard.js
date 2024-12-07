@@ -25,6 +25,17 @@ router.get('/get/bullentinBoard', async(req, res) => {
     }
 })
 
+router.get('/get/bullentinBoard_two', async(req, res) => {
+    
+    try{
+        const bullentinBoard = await BullentinBoard.findById('675200be4cc826f5e3e5f8b5');
+        res.status(200).json(bullentinBoard);
+
+    }catch(err){
+        res.status(500).json({error: err.message})
+    }
+})
+
 router.put('/update/bullentinBoard/images', async(req, res) => {
     const {images} = req.body;
     
