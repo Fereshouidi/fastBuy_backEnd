@@ -66,6 +66,17 @@ router.get('/get/categories/by/parent', async (req, res) => {
     }
 });
 
+router.get('/get/categories/by/id', async (req, res) => {
+
+    const {id} = req.query;
+    try {
+        const categorie = await Categorie.find({_id: id});
+        res.status(200).json(categorie)
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 router.get('/get/products/by/categorie', async(req, res) => {
     const {parentCategorieId} = req.query;
     

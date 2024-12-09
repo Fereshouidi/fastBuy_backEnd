@@ -96,7 +96,6 @@ router.put('/update/product/categorie', async(req, res) => {
     }
 })
 
-
 router.put('/update/product/price', async(req, res) => {
     const {productId, newPrice} = req.body;
 

@@ -9,7 +9,8 @@ const shoppingCartRouter = require('./routes/shoppingCart');
 const bulletinBoardRouter = require('./routes/bulletinBoard');
 const sliderRouter = require('./routes/slider');
 const discount = require('./routes/discount');
-const categorie = require('./routes/categorie')
+const categorie = require('./routes/categorie');
+const categoriesSection = require('./routes/categoriesSection');
 
 const PORT = 3002 || process.env.PORT;
 
@@ -28,6 +29,7 @@ app.use('/api', bulletinBoardRouter);
 app.use('/api', sliderRouter);
 app.use('/api', discount);
 app.use('/api', categorie);
+app.use('/api', categoriesSection);
 
 
 app.listen(PORT, () => {
