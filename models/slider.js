@@ -2,7 +2,12 @@ const mongoose = require('mongoose');
 
 const SliderShema = new mongoose.Schema({
     tittle: {
-        type: String,
+        english: {
+            type: String,
+        },
+        arabic: {
+            type: String,
+        }
     },
     products: {
         type: [mongoose.Schema.Types.ObjectId],

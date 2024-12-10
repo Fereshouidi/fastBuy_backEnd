@@ -43,6 +43,22 @@ router.get('/get/product/byId/:id', async(req, res) => {
     }
 })
 
+router.get('/get/product/by/biggestDiscount', async(req, res) => {
+    try{
+        const discount = await Discount.find().sort({ percentage: -1 });
+
+        if(discount[0]){
+            const products = await Product.find({discount: discount[0]._id});
+            res.status(200).json({discount: discount[0], products});
+        }else{
+            res.status(404).json({error: 'product not found !'})
+        }
+
+    }catch(err){
+        res.status(500).json({error: err.message});
+    }
+})
+
 router.get('/get/products/byRating', async (req, res) => {
     const {page, limit} = req.query;
     const skip = (page - 1) * limit;

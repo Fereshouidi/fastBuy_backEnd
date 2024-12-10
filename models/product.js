@@ -3,10 +3,20 @@ const { type } = require('os');
 
 const ProductShema = new mongoose.Schema({
     name: {
-        type: String,
+        english : {
+            type: String,
+        },
+        arabic : {
+            type: String,
+        }
     },
     description: {
-        type: String,
+        english : {
+            type: String,
+        },
+        arabic : {
+            type: String,
+        }    
     },
     price: {
         type: Number,
@@ -45,7 +55,7 @@ const ProductShema = new mongoose.Schema({
     },
     totalRating: {
         type: Number,
-        unum: [0,1,2,3,4,5],
+        enum: [0,1,2,3,4,5],
     },
     createdAt: {
         type: Date,

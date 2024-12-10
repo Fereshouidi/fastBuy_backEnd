@@ -3,7 +3,12 @@ const mongoose = require('mongoose');
 const CategorieSchema = new mongoose.Schema({
 
     name: {
-        type: String,
+        english: {
+            type: String,
+        },
+        arabic: {
+            type: String,
+        },
     },
     parentCategorie: { 
         type: mongoose.Schema.Types.ObjectId, 

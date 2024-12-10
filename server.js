@@ -11,6 +11,7 @@ const sliderRouter = require('./routes/slider');
 const discount = require('./routes/discount');
 const categorie = require('./routes/categorie');
 const categoriesSection = require('./routes/categoriesSection');
+const ConpanyInformations = require('./routes/companyInformation');
 
 const PORT = 3002 || process.env.PORT;
 
@@ -30,6 +31,7 @@ app.use('/api', sliderRouter);
 app.use('/api', discount);
 app.use('/api', categorie);
 app.use('/api', categoriesSection);
+app.use('/api', ConpanyInformations);
 
 
 app.listen(PORT, () => {
