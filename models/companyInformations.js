@@ -15,6 +15,9 @@ const ConpanyInformationsShema = new mongoose.Schema({
     primaryColor: {
         type: String,
     },
+    email: {
+        type: String,
+    },
     categories: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'categories'
@@ -44,6 +47,27 @@ const ConpanyInformationsShema = new mongoose.Schema({
     },
     servises: {
         type: [String]
+    },
+    socialMediaLinks: {
+
+        facebook: {
+            type: String,
+        },
+        messanger: {
+            type: String,
+        },
+        whatsApp: {
+            type: String,
+        },
+        instagram: {
+            type: String,
+        },
+        x: {
+            type: String,
+        },
+        youtube: {
+            type: String,
+        }
     }
 
 })

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const DiscountSchema = ({
     productId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: [mongoose.Schema.Types.ObjectId],
         ref: 'products'
     },
     percentage: {

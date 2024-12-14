@@ -79,57 +79,5 @@ router.put('/update/discount/by/id', async(req, res) => {
     }
 })
 
-// router.put('/update/product/endOfDiscounts', async(req, res) => {
-//     const {id, endOfDiscount} = req.body;
-    
-//     try{
-//         const updatedProduct = await Product.findOneAndUpdate(
-//             {_id: id},
-//             {endOfDiscount: endOfDiscount}
-//         )
-//         res.status(200).json({message: 'time updated successfuly !', updatedProduct});
-//     }catch(err){
-//         res.status(500).json({error: err.message})
-//     }
-// })
-
-// router.put('/update/product/startOfDiscount', async(req, res) => {
-//     const {id, startOfDiscount} = req.body;
-    
-//     try{
-//         const updatedProduct = await Product.findOneAndUpdate(
-//             {_id: id},
-//             {startOfDiscount: startOfDiscount}
-//         )
-//         res.status(200).json({message: 'time updated successfuly !', updatedProduct});
-//     }catch(err){
-//         res.status(500).json({error: err.message})
-//     }
-// })
-
-// router.put('/update/product/discountSticker', async(req, res) => {
-//     const {productId, discountSticker} = req.body;
-
-//     if(!productId){
-//         return res.status(404).json({error: 'product id is required !'});
-//     }
-
-//     if (!discountSticker || typeof discountSticker !== 'string' ) {
-//         return res.status(400).json({ error: 'Invalid discountSticker value!' });
-//     }
-
-//     try{
-//         const updatedProduct = await Product.findByIdAndUpdate({_id: productId}, {discountSticker: discountSticker}, {new: true});
-
-//         if(!updatedProduct){
-//             return res.status(404).json({ error: 'cannot find that product!' });
-//         }
-
-//         res.status(200).json({ message: 'discountSticker updated successfully!', product: updatedProduct });
-        
-//     }catch(err){
-//         res.status(500).json({error: err});
-//     }
-// })
 
 module.exports = router;

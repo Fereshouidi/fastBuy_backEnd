@@ -27,6 +27,9 @@ const ProductShema = new mongoose.Schema({
     quantity: {
         type: Number,
     },
+    color: {
+        type: String,
+    },
     categorie: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'categories',

@@ -13,7 +13,7 @@ router.post('/add/Product', async(req, res) => {
         await newProduct.save();
         res.status(201).json(newProduct);
     }catch(err){
-        res.status(500).json({error: err});
+        res.status(500).json({error: err.message});
     }
 })
 
@@ -26,8 +26,8 @@ router.get('/get/allProducts', async(req, res) => {
     }
 })
 
-router.get('/get/product/byId/:id', async(req, res) => {
-    const id = req.params.id;
+router.get('/get/product/byId', async(req, res) => {
+    const id = req.query.id;
     
     try{
         const product = await Product.findById(id);
@@ -50,6 +50,8 @@ router.get('/get/product/by/biggestDiscount', async(req, res) => {
         if(discount[0]){
             const products = await Product.find({discount: discount[0]._id});
             res.status(200).json({discount: discount[0], products});
+          //  console.log(discount[0].percentage);
+            
         }else{
             res.status(404).json({error: 'product not found !'})
         }
