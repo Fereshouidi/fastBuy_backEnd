@@ -30,7 +30,7 @@ router.get('/get/product/byId', async(req, res) => {
     const id = req.query.id;
     
     try{
-        const product = await Product.findById(id);
+        const product = await Product.findById(id).populate('discount').populate('categorie');
 
         if(product){
             res.status(200).json(product);

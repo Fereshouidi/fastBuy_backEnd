@@ -30,6 +30,9 @@ const ProductShema = new mongoose.Schema({
     color: {
         type: String,
     },
+    size: {
+        type: String,
+    },
     categorie: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'categories',

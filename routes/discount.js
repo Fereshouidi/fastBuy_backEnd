@@ -26,6 +26,19 @@ router.post('/add/discount', async(req, res) => {
     }
 })
 
+router.get('/get/discount/byId', async(req, res) => {
+    const id = req.query;
+
+    try{
+       
+        const discount = await Discount.findOne({_id: id});
+        res.status(200).json(discount);
+        
+    }catch(err){
+        res.status(500).json({error: err.message});
+    }
+})
+
 router.put('/update/discount/by/percentage', async(req, res) => {
     const {discountId, percentage} = req.body;
 
