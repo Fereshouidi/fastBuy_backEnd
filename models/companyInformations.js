@@ -68,6 +68,9 @@ const ConpanyInformationsShema = new mongoose.Schema({
         youtube: {
             type: String,
         }
+    },
+    backgroundOfRegisterPage: {
+        type: String,
     }
 
 })
