@@ -114,6 +114,8 @@ router.delete('/delete/customer/byId/:id', async(req, res) => {
 router.get('/account/verification', async(req, res) => {
 
     const { token } = req.query;
+    console.log(token);
+    
     try {
         const customer = await Customer.findOneAndUpdate({token}, {verification: true});
         res.status(200).send(customer)
