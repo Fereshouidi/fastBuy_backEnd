@@ -3,16 +3,20 @@ const express = require('express');
 const Customer = require('../models/customer');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+// const sendActivationEmail = require('../nodeMailer/sendActivationEmail')
 
 
 router.post('/add/customer', async(req, res) => {
-    const customerData = req.body;
+    const {customerData} = req.body;
     try{
         const newCustomer = await new Customer(customerData);
         await newCustomer.save();
-        res.status(201).json(newCustomer)
+        res.send(`An activation code has been sent`);
+
     }catch(err){
         res.status(500).json({error: err});
+        console.log(err);
+        
     }
 })
 
@@ -107,7 +111,16 @@ router.delete('/delete/customer/byId/:id', async(req, res) => {
     }
 })
 
+router.get('/account/verification', async(req, res) => {
 
+    const { token } = req.query;
+    try {
+        const customer = await Customer.findOneAndUpdate({token}, {verification: true});
+        res.status(200).send(customer)
+    }catch(err){
+        res.status(500).json({error: err});
+    }
+})
 
 
 module.exports = router;

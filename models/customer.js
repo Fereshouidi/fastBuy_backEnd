@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const { type } = require('os');
 const bcrypt = require('bcrypt');
 const ShoppingCart = require('./shoppingCart');
+const { verify } = require('crypto');
 
 const CustomerSchema = new mongoose.Schema({
     userName: {
@@ -24,8 +25,24 @@ const CustomerSchema = new mongoose.Schema({
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'shoppingCarts',
     },
+    adress: {
+        type: String,
+    },
     phone: {
         type: Number,
+    },
+    activationToken: {
+        type: Number,
+    },
+    token : {
+        type: Number
+    },
+    verification: {
+        type: Boolean,
+        default: false
+    },
+    interrestedAbout: {
+        type: String,
     },
     timeOfRegister: {
         type: Date,

@@ -18,6 +18,9 @@ const ConpanyInformationsShema = new mongoose.Schema({
     email: {
         type: String,
     },
+    password: {
+        type: String,
+    },
     categories: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'categories'
@@ -71,6 +74,20 @@ const ConpanyInformationsShema = new mongoose.Schema({
     },
     backgroundOfRegisterPage: {
         type: String,
+    },
+    registerRequiredData: {
+        dateOfBearth: {
+            type: Boolean,
+        },
+        phoneNumber: {
+            type: Boolean,
+        },
+        adress: {
+            type: Boolean,
+        },
+        interrestedAbout: {
+            type: Boolean,
+        }
     }
 
 })
