@@ -16,7 +16,7 @@ router.post('/send/activationToken', async(req, res) => {
 });
   
   try {
-    const activationLink = `https://fast-buy-back-end.vercel.app/api/account/verification?token=${activationToken}`;
+    const activationLink = `https://fast-buy-back-end.vercel.app/api/account/verification?token=${activationToken}`; 
 
     const mailOptions_english = {
         from: companyEmail,
