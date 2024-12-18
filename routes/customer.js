@@ -29,9 +29,10 @@ router.get('/get/allCustomers', async(req, res) => {
     }
 })
 
-router.get('/get/customer/byId/:id', async(req, res) => {
+router.get('/get/customer/byId', async(req, res) => {
     const id = req.query.id;
-    
+    console.log(id);
+        
     try{
         const customer = await Customer.findById(id)
 
