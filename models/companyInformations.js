@@ -88,6 +88,9 @@ const ConpanyInformationsShema = new mongoose.Schema({
         interrestedAbout: {
             type: Boolean,
         }
+    },
+    ActivateAccountWhileSignin : {
+        type: Boolean
     }
 
 })
