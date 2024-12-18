@@ -31,7 +31,6 @@ router.get('/get/allCustomers', async(req, res) => {
 
 router.get('/get/customer/byId', async(req, res) => {
     const id = req.query.id;
-    console.log(id);
         
     try{
         const customer = await Customer.findById(id)
@@ -47,8 +46,8 @@ router.get('/get/customer/byId', async(req, res) => {
     }
 })
 
-router.post('/get/customer/byCredentials', async(req, res) => {
-    const {userName, password} = req.body;
+router.get('/get/customer/byCredentials', async(req, res) => {
+    const {userName, password} = req.query;
     
     if (!userName || !password) {
         return res.status(400).json({ error: 'Username and password are required!' });
@@ -62,7 +61,7 @@ router.post('/get/customer/byCredentials', async(req, res) => {
 
         const isMatch = await bcrypt.compare(password, customer.password);
         if (!isMatch) {
-            return res.status(401).json({ error: 'Invalid credentials!' });
+            return res.status(401).json({ error: 'password is wrong !' });
         }
         
         return res.status(200).json(customer);

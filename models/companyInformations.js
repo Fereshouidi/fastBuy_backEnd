@@ -89,7 +89,7 @@ const ConpanyInformationsShema = new mongoose.Schema({
             type: Boolean,
         }
     },
-    ActivateAccountWhileSignin : {
+    activateAccountWhileSignin : {
         type: Boolean
     }
 
