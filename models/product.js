@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { type } = require('os');
+const { availableMemory } = require('process');
 
 const ProductShema = new mongoose.Schema({
     name: {

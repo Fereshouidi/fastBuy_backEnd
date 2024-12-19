@@ -11,9 +11,9 @@ const PurchaseSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'products',
     },
-    discounts: {
-        type: Number,
-        default: 0,
+    discount: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'discounts',
     },
     quantity: {
         type: Number,
@@ -29,9 +29,11 @@ const PurchaseSchema = new mongoose.Schema({
     customerRating: {
         type: Number,
         unum: [0,1,2,3,4,5],
+        default: null
     },
     customerNote:{
         type: String,
+        default: null
     },
     createdAt: {
         type: Date,
