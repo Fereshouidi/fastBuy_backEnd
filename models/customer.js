@@ -22,7 +22,7 @@ const CustomerSchema = new mongoose.Schema({
         ref: 'purchases',
     },
     ShoppingCarts: {
-        type: [mongoose.Schema.Types.ObjectId],
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'shoppingCarts',
     },
     adress: {

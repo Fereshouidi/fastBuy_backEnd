@@ -33,7 +33,7 @@ router.get('/get/customer/byId', async(req, res) => {
     const id = req.query.id;
         
     try{
-        const customer = await Customer.findById(id)
+        const customer = await Customer.findById(id).populate('ShoppingCarts')
 
         if(customer){
             res.status(200).json(customer);

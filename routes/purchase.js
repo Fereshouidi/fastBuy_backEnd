@@ -43,7 +43,15 @@ router.post('/add/purchase', async(req, res) => {
                 products: [ newPurchase.product]
             })
             await newShoppingCart.save();
+
+            await Customer.findByIdAndUpdate(
+                {_id: purchase_data.buyer},
+                {ShoppingCarts: newShoppingCart._id},
+                {new: true}
+            );
         }
+
+        
 
         res.status(201).json({message: 'purchase added successfully !', newPurchase})
     }catch(err){
