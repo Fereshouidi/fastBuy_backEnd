@@ -76,4 +76,17 @@ router.get('/get/allShoppingCarts', async(req, res) => {
     }
 })
 
+router.get('/get/activeShoppingCart/by/customer', async(req, res) => {
+
+    const customerId = req.query.id;
+    try{
+        const shoppingCarts = await ShoppingCart.findOne({
+            customer: customerId
+        });
+        res.status(200).json(shoppingCarts);
+    }catch{
+        res.status(500).json({error: err});
+    }
+})
+
 module.exports = router;
