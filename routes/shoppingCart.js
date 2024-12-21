@@ -4,6 +4,7 @@ const router = express.Router();
 const ShoppingCart = require('../models/shoppingCart');
 const Product = require('../models/product');
 const Purchase = require('../models/purchase');
+const { populate } = require('../models/companyInformations');
 
 
 
@@ -79,12 +80,19 @@ router.get('/get/allShoppingCarts', async(req, res) => {
 
 router.get('/get/activeShoppingCart/by/customer', async (req, res) => {
     const {customerId} = req.query;
-    console.log(customerId)
 
     try {
         const shoppingCarts = await ShoppingCart.find({
             customer: customerId
-        }).populate('products')
+        }).populate({
+            path: 'purchases', 
+            populate: {
+                path: 'product',
+                populate: {
+                    path: 'discount'
+                }
+            }
+        });
 
         if (!shoppingCarts) {
             return res.status(404).json({ error: "Shopping cart not found" });

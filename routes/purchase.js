@@ -8,8 +8,6 @@ const ShoppingCart = require('../models/shoppingCart');
 
 router.post('/add/purchase', async(req, res) => {
     const purchase_data = req.body;
-
-    console.log(purchase_data);
     
     try{
         const newPurchase = new Purchase(purchase_data);
@@ -21,7 +19,8 @@ router.post('/add/purchase', async(req, res) => {
             {new: true}
         );
 
-        await Product.findByIdAndUpdate(
+
+        await Product.findOneAndUpdate(
             {_id: purchase_data.product},
             {$push: {inPurchases: newPurchase._id}},
         )
@@ -56,8 +55,6 @@ router.post('/add/purchase', async(req, res) => {
         res.status(201).json({message: 'purchase added successfully !', newPurchase})
     }catch(err){
         res.status(500).json({error: err.message});
-        console.log(err);
-        
     }
 })
 
