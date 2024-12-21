@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 const ShoppingCart = require('../models/shoppingCart');
@@ -76,17 +77,26 @@ router.get('/get/allShoppingCarts', async(req, res) => {
     }
 })
 
-router.get('/get/activeShoppingCart/by/customer', async(req, res) => {
+router.get('/get/activeShoppingCart/by/customer', async (req, res) => {
+    const {customerId} = req.query;
+    console.log(customerId)
 
-    const customerId = req.query.id;
-    try{
-        const shoppingCarts = await ShoppingCart.findOne({
+    try {
+        const shoppingCarts = await ShoppingCart.find({
             customer: customerId
-        });
+        }).populate('products')
+
+        if (!shoppingCarts) {
+            return res.status(404).json({ error: "Shopping cart not found" });
+        }
+
         res.status(200).json(shoppingCarts);
-    }catch{
-        res.status(500).json({error: err});
+    } catch (err) {
+        res.status(500).json({ error: err.message || "Internal server error" });
+        //console.log(err);
+        
     }
-})
+});
+
 
 module.exports = router;

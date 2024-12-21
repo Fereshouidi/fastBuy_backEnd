@@ -16,6 +16,7 @@ const ShoppingCartSchema = new mongoose.Schema({
     },
     totalPrice: {
         type: Number,
+        default: null,
     },
     status: {
         type: String,
@@ -24,6 +25,7 @@ const ShoppingCartSchema = new mongoose.Schema({
     },    
     address: {
         type: String,
+        default: null,
     },
     paymentMethod: {
         type: String,
@@ -32,6 +34,7 @@ const ShoppingCartSchema = new mongoose.Schema({
     },
     shippingCost: {
         type: Number,
+        default: null,
     },
     lastUpdate: {
         type: Date,
