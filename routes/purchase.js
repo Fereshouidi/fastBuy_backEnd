@@ -69,8 +69,6 @@ router.get('/get/allPurchases', async(req, res) => {
 
 router.delete('/delete/purchase/byId', async (req, res) => {
     const { id } = req.query;
-
-    console.log(id);
     
     try {
         const purchase = await Purchase.findOne({ _id: id });
@@ -113,6 +111,22 @@ router.delete('/delete/purchase/byId', async (req, res) => {
     }
 });
 
+router.put('/update/quantity', async (req, res) => {
+
+    const {id, quantity} = req.body;
+    
+    try {
+        const updatedPurchase = await Purchase.findOneAndUpdate(
+            {_id: id},
+            {quantity: quantity},
+            {new: true}
+        )
+
+        res.status(200).json(updatedPurchase)
+    }catch(err){
+        res.status(500).json({error: err.message})
+    }
+})
 
 
 module.exports = router;

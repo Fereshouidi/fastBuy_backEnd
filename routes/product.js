@@ -65,24 +65,24 @@ router.get('/get/products/byRating', async (req, res) => {
     const {page, limit} = req.query;
     const skip = (page - 1) * limit;
     try {
-        const allProducts = await Product.find().sort({ totalRating: -1 }).limit(parseInt(limit)).skip(parseInt(skip));
+        const allProducts = await Product.find().sort({ totalRating: -1 }).limit(parseInt(limit)).skip(parseInt(skip)).populate('discount');
 
-        const productIds = allProducts.map(product => product._id);
+        // const productIds = allProducts.map(product => product._id);
 
-        const discounts = await Discount.find({ productId: { $in: productIds } });
+        // const discounts = await Discount.find({ productId: { $in: productIds } });
 
-        const discountMap = discounts.reduce((map, discount) => {
-            map[discount.productId] = discount;
-            return map;
-        }, {});
+        // const discountMap = discounts.reduce((map, discount) => {
+        //     map[discount.productId] = discount;
+        //     return map;
+        // }, {});
 
-        const productsWithDiscounts = allProducts.map(product => {
-            const productObj = product.toObject(); 
-            productObj.discount = discountMap[product._id] || null; 
-            return productObj;
-        });
+        // const productsWithDiscounts = allProducts.map(product => {
+        //     const productObj = product.toObject(); 
+        //     productObj.discount = discountMap[product._id] || null; 
+        //     return productObj;
+        // });
 
-        res.status(200).json(productsWithDiscounts);
+        res.status(200).json(allProducts);
 
     } catch (err) {
         res.status(500).json({ error: err.message });

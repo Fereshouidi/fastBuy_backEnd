@@ -3,7 +3,6 @@ const router = express.Router();
 const Discount = require('../models/discount');
 const Product = require('../models/product');
 const Slider = require('../models/slider');
-const { findById } = require('../models/bulletinBoard');
 
 
 
@@ -15,7 +14,10 @@ router.post('/add/discount', async(req, res) => {
         if(!product.discount){
             const newDiscount = await new Discount(data);
             newDiscount.save();
-            await Product.findOneAndUpdate({_id: data.productId}, {discount: newDiscount._id})
+            await Product.updateMany(
+                {_id: {$in: data.productId}}, 
+                {discount: newDiscount._id}
+            )
             res.status(201).json(newDiscount);
         }else{
             res.status(400).json({error : 'This product already has a discount !'})
