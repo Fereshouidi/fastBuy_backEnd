@@ -67,6 +67,51 @@ router.get('/get/allPurchases', async(req, res) => {
     }
 })
 
+router.delete('/delete/purchase/byId', async (req, res) => {
+    const { id } = req.query;
+
+    console.log(id);
+    
+    try {
+        const purchase = await Purchase.findOne({ _id: id });
+        if (!purchase) {
+            return res.status(404).json({ message: 'Purchase not found' });
+        }
+
+        const customer = await Customer.findByIdAndUpdate(
+            purchase.buyer,
+            { $pull: { purchases: purchase._id } },
+            { new: true }
+        );
+        if (!customer) {
+            return res.status(404).json({ message: 'Customer not found' });
+        }
+
+        const product = await Product.findByIdAndUpdate(
+            purchase.product,
+            { $pull: { inPurchases: purchase._id } },
+            { new: true }
+        );
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        await ShoppingCart.findOneAndUpdate(
+            { customer: customer._id },
+            {
+                $pull: { purchases: purchase._id, products: purchase.product },
+                $set: { lastUpdate: new Date() },
+            },
+            { new: true }
+        );
+
+        await Purchase.findByIdAndDelete(id);
+
+        res.status(200).json({ message: 'Purchase deleted successfully!', customer });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 
 
