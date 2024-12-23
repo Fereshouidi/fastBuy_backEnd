@@ -34,7 +34,7 @@ const ShoppingCartSchema = new mongoose.Schema({
     },
     shippingCost: {
         type: Number,
-        default: null,
+        default: 0,
     },
     lastUpdate: {
         type: Date,
