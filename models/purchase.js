@@ -11,6 +11,10 @@ const PurchaseSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'products',
     },
+    shoppingCart: {
+        type: mongoose.Schema.Types.ObjectId || null,
+        ref: 'shoppingCarts',
+    },
     discount: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'discounts',

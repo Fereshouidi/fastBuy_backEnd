@@ -91,7 +91,10 @@ const ConpanyInformationsShema = new mongoose.Schema({
     },
     activateAccountWhileSignin : {
         type: Boolean
-    }
+    },
+    currencyType: {
+        type: String,
+    },
 
 })
 
