@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
-const { type } = require('os');
 
-const ShoppingCartSchema = new mongoose.Schema({
+const OrderSchema = mongoose.Schema({
     customer: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'customers',
@@ -13,10 +12,6 @@ const ShoppingCartSchema = new mongoose.Schema({
     purchases: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'purchases',
-    },
-    discountCode: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'discountCodes',
     },
     totalPrice: {
         type: Number,
@@ -49,7 +44,5 @@ const ShoppingCartSchema = new mongoose.Schema({
     },
 })
 
-const ShoppingCart = mongoose.model('shoppingCarts', ShoppingCartSchema);
-module.exports = ShoppingCart;
-
-
+const Order = mongoose.model('orders', OrderSchema);
+module.exports = Order;

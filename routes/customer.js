@@ -3,7 +3,6 @@ const express = require('express');
 const Customer = require('../models/customer');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-// const sendActivationEmail = require('../nodeMailer/sendActivationEmail')
 
 
 router.post('/add/customer', async(req, res) => {
@@ -14,9 +13,7 @@ router.post('/add/customer', async(req, res) => {
         res.status(201).json(newCustomer);
 
     }catch(err){
-        res.status(500).json({error: err});
-        console.log(err);
-        
+        res.status(500).json({error: err.message});
     }
 })
 
@@ -33,7 +30,7 @@ router.get('/get/customer/byId', async(req, res) => {
     const id = req.query.id;
         
     try{
-        const customer = await Customer.findById(id).populate('ShoppingCarts')
+        const customer = await Customer.findById(id).populate('ShoppingCart')
 
         if(customer){
             res.status(200).json(customer);

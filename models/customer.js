@@ -21,9 +21,10 @@ const CustomerSchema = new mongoose.Schema({
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'purchases',
     },
-    ShoppingCarts: {
-        type: mongoose.Schema.Types.ObjectId,
+    ShoppingCart: {
+        type: mongoose.Schema.Types.ObjectId || null,
         ref: 'shoppingCarts',
+        default: null
     },
     adress: {
         type: String,

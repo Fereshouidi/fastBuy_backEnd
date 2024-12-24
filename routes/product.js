@@ -30,7 +30,7 @@ router.get('/get/product/byId', async(req, res) => {
     const id = req.query.id;
     
     try{
-        const product = await Product.findById(id).populate('discount').populate('categorie');
+        const product = await Product.findById(id).populate('discount').populate('categorie').populate('discountCode');
 
         if(product){
             res.status(200).json(product);
@@ -66,21 +66,6 @@ router.get('/get/products/byRating', async (req, res) => {
     const skip = (page - 1) * limit;
     try {
         const allProducts = await Product.find().sort({ totalRating: -1 }).limit(parseInt(limit)).skip(parseInt(skip)).populate('discount');
-
-        // const productIds = allProducts.map(product => product._id);
-
-        // const discounts = await Discount.find({ productId: { $in: productIds } });
-
-        // const discountMap = discounts.reduce((map, discount) => {
-        //     map[discount.productId] = discount;
-        //     return map;
-        // }, {});
-
-        // const productsWithDiscounts = allProducts.map(product => {
-        //     const productObj = product.toObject(); 
-        //     productObj.discount = discountMap[product._id] || null; 
-        //     return productObj;
-        // });
 
         res.status(200).json(allProducts);
 

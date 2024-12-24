@@ -48,6 +48,10 @@ const ProductShema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'discounts',
     },
+    discountCode: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'discountCodes',
+    },
     inPurchases: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'purchases',

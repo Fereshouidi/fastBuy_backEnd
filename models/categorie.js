@@ -19,6 +19,10 @@ const CategorieSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'categories'
     }],
+    discountCode: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'discountCodes',
+    },
     margin: {
         type: Number,
         default: 0

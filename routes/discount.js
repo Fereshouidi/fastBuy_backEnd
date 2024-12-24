@@ -70,7 +70,7 @@ router.put('/update/discount/by/percentage', async(req, res) => {
         res.status(200).json({ message: 'discount updated successfully!', product: updatedDiscount });
         
     }catch(err){
-        res.status(500).json({error: err});
+        res.status(500).json({error: err.message});
     }
 })
 

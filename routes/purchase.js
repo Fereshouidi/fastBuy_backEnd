@@ -37,8 +37,9 @@ router.post('/add/purchase', async(req, res) => {
             });
             return totalPrice;
         }
+        
 
-        if(shoppingCart.length == 1){          
+        if(shoppingCart.length == 1){    
 
             await ShoppingCart.findByIdAndUpdate(
                 {_id: shoppingCart[0]._id},
@@ -73,9 +74,11 @@ router.post('/add/purchase', async(req, res) => {
                 {totalPrice : getTotalPrice(newShoppingCart)}
             )
 
+            console.log('bech :' + purchase_data.buyer);
+            
             await Customer.findByIdAndUpdate(
                 {_id: purchase_data.buyer},
-                {ShoppingCarts: newShoppingCart._id},
+                {ShoppingCart: newShoppingCart._id},
                 {new: true}
             );
         }
