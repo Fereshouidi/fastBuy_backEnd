@@ -30,6 +30,10 @@ const PurchaseSchema = new mongoose.Schema({
         default: 'cart',
         enum: ['cart', 'processing', 'shipped', 'delivered', 'canceled', 'payment_failed', 'returned', 'out_of_stock', 'ready_for_pickup'],
     },
+    discountCode: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'discountCodes',
+    },
     customerRating: {
         type: Number,
         unum: [0,1,2,3,4,5],

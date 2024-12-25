@@ -29,6 +29,13 @@ const DiscountCodeSchema = new mongoose.Schema({
         type: Number || null,
         default: null
     },
+    quantity: {
+        type: Number || null,
+    },
+    createdAt: {
+        type: Date,
+        default: new Date
+    }
 });
 
 const DiscountCode = mongoose.model('discountCodes', DiscountCodeSchema);
