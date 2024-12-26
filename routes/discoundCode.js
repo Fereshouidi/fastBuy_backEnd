@@ -5,7 +5,6 @@ const router = express.Router();
 
 router.post('/add/discountCode', async(req, res) => {
     const discountCodeData = req.body;
-    console.log(discountCodeData);
     
     try{
         const discountCode = await new DiscountCode(discountCodeData);

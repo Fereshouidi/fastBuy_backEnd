@@ -22,6 +22,9 @@ const ProductShema = new mongoose.Schema({
     price: {
         type: Number,
     },
+    finalPrice: {
+        type: Number,
+    },
     currencyType: {
         type: String,
     },

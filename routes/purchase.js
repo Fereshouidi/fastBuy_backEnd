@@ -160,32 +160,78 @@ router.delete('/delete/purchase/byId', async (req, res) => {
     }
 });
 
-router.put('/update/quantity', async (req, res) => {
-    const { id, quantity } = req.body;
+// router.put('/update/quantity', async (req, res) => {
+//     const { id, quantity } = req.body;
     
-    if (!id || !quantity || isNaN(quantity)) {
+//     console.log(id, quantity );
+    
+//     if (!id || !quantity || isNaN(quantity)) {
+//         return res.status(400).json({ error: 'Invalid input data' });
+//     }
+
+//     try {
+//         const purchase = await Purchase.findOne({ _id: id }).populate({
+//             path: 'product',
+//             populate: 'discount'
+//         })
+        
+//         if (!purchase) {
+//             return res.status(404).json({ error: 'Purchase not found' });
+//         }
+
+//         const productPrice = purchase.product && purchase.product.discount
+//             ? purchase.product.discount.newPrice
+//             : purchase.product ? purchase.product.price : 0;
+
+//         const totalPrice = productPrice * quantity;
+        
+//         const updatedPurchase = await Purchase.findOneAndUpdate(
+//             { _id: id },
+//             { quantity, totalPrice },
+//             { new: true }
+//         );
+
+//         const getTotalPriceOfShoppingCart = (shoppingCart) => {
+//             let totalPrice = 0;
+//             shoppingCart.purchases.forEach(purchase => {
+//                 totalPrice = totalPrice + purchase.totalPrice
+//             });
+//             return totalPrice;
+//         }
+
+//         const shoppingCart = await ShoppingCart.findOne({_id: updatedPurchase.shoppingCart}).populate('purchases');
+
+//         await ShoppingCart.findOneAndUpdate(
+
+//             {_id: shoppingCart._id},
+//             {
+//                 totalPrice : getTotalPriceOfShoppingCart(shoppingCart),
+//                 lastUpdate: new Date
+//             },
+//             {new: true}
+//         )
+
+//         res.status(200).json(updatedPurchase);
+
+//     } catch (err) {
+//         res.status(500).json({ error: err.message });      
+//         console.log(err);
+          
+//     }
+// });
+
+router.put('/update/quantity', async (req, res) => {
+    const updatedPurchase = req.body;
+        
+    if (!updatedPurchase) {
         return res.status(400).json({ error: 'Invalid input data' });
     }
 
     try {
-        const purchase = await Purchase.findOne({ _id: id }).populate({
-            path: 'product',
-            populate: 'discount'
-        })
         
-        if (!purchase) {
-            return res.status(404).json({ error: 'Purchase not found' });
-        }
-
-        const productPrice = purchase.product && purchase.product.discount
-            ? purchase.product.discount.newPrice
-            : purchase.product ? purchase.product.price : 0;
-
-        const totalPrice = productPrice * quantity;
-        
-        const updatedPurchase = await Purchase.findOneAndUpdate(
-            { _id: id },
-            { quantity, totalPrice },
+        await Purchase.findOneAndUpdate(
+            { _id: updatedPurchase._id },
+             updatedPurchase,
             { new: true }
         );
 
@@ -197,8 +243,7 @@ router.put('/update/quantity', async (req, res) => {
             return totalPrice;
         }
 
-        const shoppingCart = await ShoppingCart.findOne({_id: updatedPurchase.shoppingCart}).populate('purchases')
-        
+        const shoppingCart = await ShoppingCart.findOne({_id: updatedPurchase.shoppingCart}).populate('purchases');
 
         await ShoppingCart.findOneAndUpdate(
 

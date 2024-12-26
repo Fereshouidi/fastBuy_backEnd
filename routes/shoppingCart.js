@@ -83,16 +83,18 @@ router.get('/get/activeShoppingCart/by/customer', async (req, res) => {
 
     try {
         const shoppingCarts = await ShoppingCart.find({
-            customer: customerId
+            customer: customerId,
         }).populate({
-            path: 'purchases', 
+            path: 'purchases',
             populate: {
                 path: 'product',
-                populate: {
-                    path: 'discount'
-                }
-            }
+                populate: [
+                    { path: 'discount' },
+                    { path: 'discountCode' },
+                ],
+            },
         });
+        
 
         if (!shoppingCarts) {
             return res.status(404).json({ error: "Shopping cart not found" });
