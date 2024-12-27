@@ -31,6 +31,11 @@ const OrderSchema = mongoose.Schema({
         default: 'cash',
         enum: ['cash', 'paypal', 'masterCard']
     },
+    discountCode: {
+        type: mongoose.Schema.Types.ObjectId || null,
+        default: null,
+        ref: 'discountCodes',
+    },
     shippingCost: {
         type: Number,
         default: 0,

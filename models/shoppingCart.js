@@ -15,7 +15,8 @@ const ShoppingCartSchema = new mongoose.Schema({
         ref: 'purchases',
     },
     discountCode: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId || null,
+        default: null,
         ref: 'discountCodes',
     },
     totalPrice: {

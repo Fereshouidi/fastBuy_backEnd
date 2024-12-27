@@ -16,4 +16,17 @@ router.post('/add/discountCode', async(req, res) => {
     }
 })
 
+router.get('/get/discountCodes/for/shoppingCarts', async(req, res) => {
+
+    try{
+        const discountCodes = await DiscountCode.find({
+            target: 'shoppingCart'
+        })
+        res.status(201).json(discountCodes);
+
+    }catch(err){
+        res.status(500).json({error: err.message});
+    }
+})
+
 module.exports = router;

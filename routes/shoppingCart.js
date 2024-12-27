@@ -84,7 +84,7 @@ router.get('/get/activeShoppingCart/by/customer', async (req, res) => {
     try {
         const shoppingCarts = await ShoppingCart.find({
             customer: customerId,
-        }).populate({
+        }).populate([{
             path: 'purchases',
             populate: {
                 path: 'product',
@@ -93,7 +93,9 @@ router.get('/get/activeShoppingCart/by/customer', async (req, res) => {
                     { path: 'discountCode' },
                 ],
             },
-        });
+        }, {
+            path: 'customer',
+        }]);
         
 
         if (!shoppingCarts) {
