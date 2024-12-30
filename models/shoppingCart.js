@@ -26,7 +26,7 @@ const ShoppingCartSchema = new mongoose.Schema({
     status: {
         type: String,
         default: 'cart',
-        enum: ['cart', 'processing', 'shipped', 'delivered', 'canceled', 'payment_failed','Being returned', 'returned', 'out_of_stock', 'ready_for_pickup'],
+        enum: ['cart', 'processing', 'packaged', 'shipped', 'delivered', 'canceled', 'failed','Being returned', 'returned', 'out_of_stock', 'ready_for_pickup'],
     },    
     address: {
         type: String,
@@ -39,7 +39,7 @@ const ShoppingCartSchema = new mongoose.Schema({
     },
     shippingCost: {
         type: Number,
-        default: 0,
+        default: 7,
     },
     lastUpdate: {
         type: Date,

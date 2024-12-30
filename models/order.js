@@ -19,9 +19,12 @@ const OrderSchema = mongoose.Schema({
     },
     status: {
         type: String,
-        default: 'cart',
-        enum: ['cart', 'processing', 'shipped', 'delivered', 'canceled', 'payment_failed','Being returned', 'returned', 'out_of_stock', 'ready_for_pickup'],
+        default: 'processing',
+        enum: ['cart', 'processing', 'packaged', 'shipped', 'delivered', 'canceled', 'failed','Being returned', 'returned', 'out_of_stock', 'ready_for_pickup'],
     },    
+    note: {
+        type: String,
+    },
     address: {
         type: String,
         default: null,
