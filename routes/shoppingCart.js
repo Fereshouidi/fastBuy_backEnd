@@ -95,6 +95,8 @@ router.get('/get/activeShoppingCart/by/customer', async (req, res) => {
             },
         }, {
             path: 'customer',
+        }, {
+            path: 'products'
         }]);
         
 

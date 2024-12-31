@@ -43,6 +43,10 @@ const PurchaseSchema = new mongoose.Schema({
         type: String,
         default: null
     },
+    like : {
+        type: Boolean,
+        default: false
+    },
     createdAt: {
         type: Date,
         default: new Date,
