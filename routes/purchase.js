@@ -4,6 +4,7 @@ const Purchase = require('../models/purchase');
 const Customer = require('../models/customer');
 const Product = require('../models/product');
 const ShoppingCart = require('../models/shoppingCart');
+const CompanyInformations = require('../models/companyInformations');
 
 
 router.post('/add/purchase', async(req, res) => {
@@ -57,10 +58,13 @@ router.post('/add/purchase', async(req, res) => {
 
         }else{
 
+            const companyInformations = await CompanyInformations.find();
+
             const newShoppingCart = await new ShoppingCart({
                 customer: customer._id,
                 purchases: newPurchase,
-                products: [ newPurchase.product]
+                products: [ newPurchase.product],
+                shippingCost: companyInformations[0].shippingCost
             })
             await newShoppingCart.save();
 
@@ -218,7 +222,29 @@ router.put('/update/likeStatus', async(req, res) => {
             {like: likeStatus},
             {new: true}
         )
-        res.status(200).json({ message: 'like status updated successfully!', purchase: updatedPurchase });
+
+        let customer = await Customer.findOne({_id: updatedPurchase.buyer})
+
+        if (likeStatus == true) {
+
+            customer = await Customer.findOneAndUpdate(
+                {_id: updatedPurchase.buyer},
+                {$addToSet: {favorite: updatedPurchase.product._id}},
+                {new: true}
+            )
+
+        } else {
+
+            customer = await Customer.findOneAndUpdate(
+                {_id: updatedPurchase.buyer},
+                {$pull: {favorite: updatedPurchase.product._id}},
+                {new: true}
+            )
+
+        }
+        
+
+        res.status(200).json({ message: 'like status updated successfully!', updatedCustomer: customer });
         
     }catch(err){
         res.status(500).json({error: err});

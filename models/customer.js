@@ -26,6 +26,10 @@ const CustomerSchema = new mongoose.Schema({
         ref: 'shoppingCarts',
         default: null
     },
+    favorite: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'products'
+    },
     adress: {
         type: String,
     },

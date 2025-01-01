@@ -36,6 +36,10 @@ const ConpanyInformationsShema = new mongoose.Schema({
     country: {
         type: String,
     },
+    shippingCost: {
+        type: Number,
+        default: 0
+    },
     Entities: {
         type: [String]
     },
