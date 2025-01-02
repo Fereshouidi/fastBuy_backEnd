@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../models/order');
 const ShoppingCart = require('../models/shoppingCart');
+const Purchase = require('../models/purchase');
 const Customer = require('../models/customer');
 const { populate } = require('../models/companyInformations');
 
@@ -25,6 +26,12 @@ router.post('/add/order', async(req, res) => {
             {_id: orderData.customer},
             {ShoppingCart: null}
         );
+
+        await Purchase.updateMany(
+            { _id: { $in: orderData.purchases } },
+            { status: 'processing' }
+        );
+        
 
         if ( !customer.adress || !customer.phone ) {
             
