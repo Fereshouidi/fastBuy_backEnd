@@ -73,7 +73,7 @@ router.get('/gt/orders/byCustomer', async(req, res) => {
                 path: 'customer',
             }
             
-        ]);
+        ]).sort({createdAt: -1})
         
         
         res.status(201).json(orders);
