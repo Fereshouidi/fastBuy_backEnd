@@ -424,6 +424,8 @@ router.put('/update/likeStatus', async(req, res) => {
 
         let customer = await Customer.findOne({_id: updatedPurchase.buyer})
 
+        console.log(customer);
+        
         if (likeStatus == true) {
 
             customer = await Customer.findOneAndUpdate(

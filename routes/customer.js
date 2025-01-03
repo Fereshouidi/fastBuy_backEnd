@@ -30,7 +30,12 @@ router.get('/get/customer/byId', async(req, res) => {
     const id = req.query.id;
         
     try{
-        const customer = await Customer.findById(id).populate('ShoppingCart').populate('favorite')
+        const customer = await Customer.findById(id).populate('ShoppingCart').populate({
+            path: 'favorite',
+            populate: {
+                path: 'discount'
+            }
+        })
 
         if(customer){
             res.status(200).json(customer);
@@ -70,10 +75,7 @@ router.get('/get/customer/byCredentials', async(req, res) => {
 
 router.put('/update/customer', async(req, res) => {
 
-    const {id, updatedCustomerData} = req.body;
-
-    console.log( updatedCustomerData);
-    
+    const {id, updatedCustomerData} = req.body;    
 
     if(!id){
         return res.status(404).json({error: 'customer id is required !'});

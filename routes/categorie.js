@@ -27,6 +27,17 @@ router.post('/add/categorie', async (req, res) => {
     }
 });
 
+router.get('/get/categorie/by/id', async (req, res) => {
+
+    const {id} = req.query;
+    try {
+        const categorie = await Categorie.findOne({_id: id});
+        res.status(200).json(categorie)
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 router.get('/get/categories/tree', async (req, res) => {
     try {
         const allCategories = await Categorie.find().lean();
@@ -96,7 +107,7 @@ router.get('/get/products/by/categorie', async(req, res) => {
         }
         
         
-        const products = await Product.find({categorie: {$in: categories}})
+        const products = await Product.find({categorie: {$in: categories}}).populate('discount')
          
         res.status(200).json(products);
 
