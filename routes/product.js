@@ -74,6 +74,28 @@ router.get('/get/products/byRating', async (req, res) => {
     }
 });
 
+router.get('/get/products/by/name', async (req, res) => {
+    const {searchQuery} = req.query;
+
+    try {
+        const products = await Product.find({
+            $or: [
+                {"name.english": {$regex: searchQuery, $options: 'i'}},
+                {"name.arabic": {$regex: searchQuery, $options: 'i'}}
+            ]
+        }).sort({
+            totalRating : (-1)
+        }).populate('discount')
+
+        res.status(200).json(products);
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log(err);
+        
+    }
+});
+
 router.put('/update/product/categorie', async(req, res) => {
     const {productId, categorieId} = req.body;
 
