@@ -67,9 +67,17 @@ const ProductShema = new mongoose.Schema({
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'reviews'
     },
+    totalRatingSum:  {
+        type: Number,
+    },
     totalRating: {
         type: Number,
-        enum: [0,1,2,3,4,5],
+        default: 0
+        //enum: [0,1,2,3,4,5],
+    },
+    evaluators: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'customer'
     },
     createdAt: {
         type: Date,

@@ -4,8 +4,7 @@ const Order = require('../models/order');
 const ShoppingCart = require('../models/shoppingCart');
 const Purchase = require('../models/purchase');
 const Customer = require('../models/customer');
-const { populate } = require('../models/companyInformations');
-
+const Product = require('../models/product');
 
 router.post('/add/order', async(req, res) => {
 
@@ -31,6 +30,13 @@ router.post('/add/order', async(req, res) => {
             { _id: { $in: orderData.purchases } },
             { status: 'processing' }
         );
+        
+        for (const purchase of orderData.purchases) {
+            const product = await Product.updateOne(
+                { _id: purchase.product._id },
+                { $inc: { quantity: -purchase.quantity } }
+            );            
+        }
         
 
         if ( !customer.adress || !customer.phone ) {
