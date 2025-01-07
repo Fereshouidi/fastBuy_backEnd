@@ -32,6 +32,7 @@ router.post('/add/order', async(req, res) => {
         );
         
         for (const purchase of orderData.purchases) {
+            
             const product = await Product.updateOne(
                 { _id: purchase.product._id },
                 { $inc: { quantity: -purchase.quantity } }
@@ -54,7 +55,7 @@ router.post('/add/order', async(req, res) => {
         res.status(201).json(newOrder);
 
     }catch(err) {
-        res.status(500).json({error : err.message})
+        res.status(500).json({error : err.message});
     }
 })
 

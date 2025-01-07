@@ -56,7 +56,7 @@ router.get('/get/customer/byCredentials', async(req, res) => {
     }
     
     try{
-        const customer = await Customer.findOne({userName});
+        const customer = await Customer.findOne({userName}).populate('favorite');
         if(!customer){
             return res.status(404).json({error: 'customer not found !'})
         }
@@ -148,7 +148,6 @@ router.delete('/delete/customer/byId/:id', async(req, res) => {
 router.get('/account/verification', async(req, res) => {
 
     const { token } = req.query;
-    console.log(token);
     
     try {
         const customer = await Customer.findOneAndUpdate({token}, {verification: true});

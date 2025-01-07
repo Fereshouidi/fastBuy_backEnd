@@ -10,7 +10,6 @@ router.post('/add/conpanyInformations', async(req, res) => {
     try{
         const newConpanyInformations = await new ConpanyInformations(data);
         await newConpanyInformations.save();
-        console.log(newConpanyInformations);
         
     }catch(err){
         console.log(err);
@@ -22,6 +21,8 @@ router.get('/get/conpanyInformations', async(req, res) => {
     try{
         const conpanyInformations = await ConpanyInformations.findById('675889a2c692d613c16b8c47');
         res.status(200).json(conpanyInformations);
+        console.log(conpanyInformations);
+        
     }catch(err){
         res.status(500).json({error: err.message});
     }
