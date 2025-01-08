@@ -32,11 +32,10 @@ router.put('/update/review', async (req, res) => {
 
         } else if (res_.status == 200) {
 
-            res.status(200).json({
+            return res.status(200).json({
                 message: 'review has been updated successfully.',
                 newReview: res_.newReview
             }); 
-            console.log('review has been updated successfully.');
 
         }
     }
@@ -76,16 +75,23 @@ router.get('/get/reviews/by/product', async(req, res) => {
     const {productId} = req.query;
 
     try{
-        const purchases = await Review.find({product: productId}).populate('customer');
-        const reviews = purchases.filter(review => review.customerNote);
+        const reviews = await Review.find({product: productId}).populate('customer');
+        const reviewsNotes = reviews.filter(review => review.customerNote);
 
-        console.log(productId);
+        console.log(reviews.length);
         
         res.status(200).json(reviews);
     }catch (err){
         res.status(500).json({error: err.message});
+        console.log(err);
+        
     }
 })
+
+
+
+
+
 
 const addeview = async (customerId, productId, customerRating, customerNote) => {
     const newReview = new Review({
