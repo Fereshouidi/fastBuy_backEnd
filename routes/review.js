@@ -23,6 +23,10 @@ const CompanyInformations = require('../models/companyInformations');
 router.put('/update/review', async (req, res) => {
     const { reviewId, customerId, productId, customerRating, customerNote } = req.body;    
 
+    if (!customerNote) {
+        return res.status(400).json({ error: 'customerNote is necessery !' });
+    }
+
     if (!reviewId) {
         const res_ = addeview(customerId, productId, customerRating, customerNote) ;
 
@@ -49,7 +53,7 @@ router.put('/update/review', async (req, res) => {
 
         if (res_.status == 400) {
 
-            return res.status(404).json({ error: 'Review not found!' });
+            return res.status(400).json({ error: res_.message }); log
 
         } else if (res_.status == 404) {
 
@@ -147,6 +151,11 @@ const addeview = async (customerId, productId, customerRating, customerNote) => 
 }
 
 const updateReview = async (reviewId, customerRating, customerNote) => {
+
+    if (!customerNote) {
+        console.log('hh');
+        return {status: 400, message: 'customerNote is necessery !'}
+    }
 
     const review = await Review.findOne({ _id: reviewId });
 
