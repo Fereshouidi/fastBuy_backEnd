@@ -53,7 +53,7 @@ router.put('/update/review', async (req, res) => {
 
         if (res_.status == 400) {
 
-            return res.status(400).json({ error: res_.message }); log
+            return res.status(400).json({ error: res_.message }); 
 
         } else if (res_.status == 404) {
 
