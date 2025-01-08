@@ -11,6 +11,10 @@ router.post('/add/purchase', async(req, res) => {
 
     const purchase_data = req.body;    
 
+    if (!purchase_data.product) {
+        return res.status(400).json({error: 'product id is necessary !'});
+    }
+
     try{     
         const purchaseExistAlready = await Purchase.findOne({
             buyer: purchase_data.buyer,
