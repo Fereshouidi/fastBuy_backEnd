@@ -28,7 +28,7 @@ router.put('/update/review', async (req, res) => {
 
         if (res_.status == 400) {
 
-            return res.status(404).json({ error: 'Product not found!' });
+            return res.status(404).json({ error: res_.message });
 
         } else if (res_.status == 200) {
 
@@ -57,11 +57,10 @@ router.put('/update/review', async (req, res) => {
 
         } else if (res_.status == 200) {
 
-            res.status(200).json({
+            return res.status(200).json({
                 message: 'review has been updated successfully.',
                 updatedReview: res_.updateReview,
             }); 
-            console.log('review has been updated successfully.');
         }
         
     } catch (err) {
@@ -78,11 +77,28 @@ router.get('/get/reviews/by/product', async(req, res) => {
         const reviews = await Review.find({product: productId}).populate('customer');
         const reviewsNotes = reviews.filter(review => review.customerNote);
 
-        console.log(reviews.length);
+      //  console.log(reviews.length);
         
-        res.status(200).json(reviews);
+        res.status(200).json(reviewsNotes);
     }catch (err){
         res.status(500).json({error: err.message});
+        console.log(err);
+        
+    }
+})
+
+router.get('/get/review/by/customer&product', async(req, res) => {
+    const {customerId, productId} = req.query;
+    
+    try{
+        const review = await Review.findOne({
+            customer: customerId,
+            product: productId,
+        });        
+                
+        res.status(200).json(review);
+    }catch{
+        res.status(500).json({error: err});
         console.log(err);
         
     }
@@ -91,9 +107,11 @@ router.get('/get/reviews/by/product', async(req, res) => {
 
 
 
-
-
 const addeview = async (customerId, productId, customerRating, customerNote) => {
+
+    if (!customerNote) {
+        return {status: 400, message: 'customerNote is necessery !'}
+    }
     const newReview = new Review({
         customer: customerId,
         product: productId,
@@ -148,7 +166,7 @@ const updateReview = async (reviewId, customerRating, customerNote) => {
         return {status: 404}
     }
 
-    if (product.evaluators.includes(updatedPurchase.customer)) {
+    if (product.evaluators.includes(updatedReview.customer)) {
 
         product.totalRatingSum -= review.customerRating ;
         product.totalRatingSum += customerRating;
