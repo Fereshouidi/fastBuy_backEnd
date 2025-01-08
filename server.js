@@ -15,6 +15,7 @@ const ConpanyInformations = require('./routes/companyInformation');
 const dealingWithEmails = require('./routes/dealingWithEmails');
 const order = require('./routes/order');
 const discountCode = require('./routes/discoundCode');
+const review = require('./routes/review');
 
 const PORT = 3002 || process.env.PORT;
 
@@ -38,6 +39,7 @@ app.use('/api', ConpanyInformations);
 app.use('/api', dealingWithEmails);
 app.use('/api', order);
 app.use('/api', discountCode);
+app.use('/api', review);
 
 
 app.listen(PORT, () => {

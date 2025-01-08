@@ -2,17 +2,18 @@ const mongoose = require("mongoose");
 const Product = require("./product");
 
 const ReviewShema = new mongoose.Schema({
-    customer_id: {
+    customer: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'customers',
     },
-    product_id: {
+    product: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'products',
     },
     customerRating: {
         type: Number,
-        unum: [0,1,2,3,4,5],
+        default: null,
+        unum: [null, 0,5, 1 ,1.5 ,2 ,2.5, 3, 3.5, 4, 4.5,  5],
     },
     customerNote:{
         type: String,
