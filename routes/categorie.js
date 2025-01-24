@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Categorie = require('../models/categorie');
+const CategoriesSection = require('../models/categoriesSection');
 const Product = require('../models/product');
 
 router.post('/add/categorie', async (req, res) => {
@@ -16,7 +17,7 @@ router.post('/add/categorie', async (req, res) => {
                 { $push: { childrenCategories: newCategorie._id } }
             );
         }
-
+        
         res.status(201).json({
             message: 'Category added successfully!',
             category: newCategorie,
@@ -30,11 +31,20 @@ router.post('/add/categorie', async (req, res) => {
 router.get('/get/categorie/by/id', async (req, res) => {
 
     const {id} = req.query;
+    
     try {
         const categorie = await Categorie.findOne({_id: id});
-        res.status(200).json(categorie)
+
+        if (!categorie) {
+            return res.status(404).json("categorie not found !");
+        }
+
+        res.status(200).json(categorie);
+
     } catch (err) {
         res.status(500).json({ error: err.message });
+        console.log(err);
+        
     }
 });
 
@@ -116,7 +126,88 @@ router.get('/get/products/by/categorie', async(req, res) => {
     }
 })
 
+router.put('/rename/categorie/by/id', async (req, res) => {
+    const {categorieId, newName} = req.body;
 
+    console.log(categorieId, newName);
+    
+    try {
+        const categorie = await Categorie.findOne({_id: categorieId});
+        console.log(categorie);
+        
+
+        if (!categorie) {
+            return res.status(400).json({error: "This categorie doesn't found ! "})
+        }
+
+        if (!categorie.parentCategorie) {
+            return res.status(400).json({error: "The name of this categorie can't be changed ! "})
+        }
+
+        const updatedCategorie = await Categorie.findOneAndUpdate(
+            {_id: categorieId},
+            {name: newName}
+        );
+
+        res.status(200).json({
+            message: 'Category updated successfully!',
+            category: updatedCategorie,
+        });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.delete('/delete/categorie/by/id/:categorieId', async (req, res) => {
+    const { categorieId } = req.params;
+
+    try {
+        const categorie = await Categorie.findById(categorieId);
+        if (!categorie) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
+
+        const getAllChildCategories = async (parentId) => {
+            let categoriesToDelete = [parentId];
+            let queue = [parentId];
+
+            while (queue.length > 0) {
+                const currentId = queue.shift();
+                const children = await Categorie.find({ parentCategorie: currentId });
+
+                if (children.length > 0) {
+                    queue.push(...children.map(cat => cat._id));
+                    categoriesToDelete.push(...children.map(cat => cat._id));
+                }
+            }
+            return categoriesToDelete;
+        };
+
+        const categoriesToDelete = await getAllChildCategories(categorieId);
+
+        await Categorie.deleteMany({ _id: { $in: categoriesToDelete } });
+
+        const categorieParent = await Categorie.findByIdAndUpdate(
+            categorie.parentCategorie,
+            {$pull: {childrenCategories: categorieId}}
+        );
+
+
+        const updateCategoriesSection = await CategoriesSection.updateMany(
+            {},
+            { $pull: { categoriesList: { $in: categoriesToDelete } } }
+        );
+
+        res.status(200).json({
+            message: 'Category and its subcategories deleted successfully!',
+            updateCategoriesSection: updateCategoriesSection,
+        });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 
 

@@ -7,18 +7,6 @@ const Product = require('../models/product');
 const ShoppingCart = require('../models/shoppingCart');
 const CompanyInformations = require('../models/companyInformations');
 
-// router.post('/update/review', async (req, res) => {
-//     const review_Data = req.res;
-
-//     try {
-
-//         const newReview = await new Review(review_Data);
-//         newReview.save();
-
-//     } catch {
-//         res.status(500).json({error: error.message});
-//     }
-// })
 
 router.put('/update/review', async (req, res) => {
     const { reviewId, customerId, productId, customerRating, customerNote } = req.body;    
