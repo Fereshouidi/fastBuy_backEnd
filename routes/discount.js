@@ -86,25 +86,71 @@ router.put('/update/discount/by/percentage', async(req, res) => {
     }
 })
 
+router.put('/update/slider', async (req, res) => {
+    const { id } = req.body;
+
+    try {
+        const discount = await Discount.findById(id);
+        if (!discount) {
+            return res.status(404).json({ error: "Discount not found" });
+        }
+
+        const product = await Product.findById(discount.productId);
+        if (!product) {
+            return res.status(404).json({ error: "Product not found" });
+        }
+
+        await Slider.updateOne(
+            {},  
+            { $pull: { products: product._id } }
+        );
+
+
+        res.status(200).json({
+            message: "Discount deleted successfully and product removed from slider!",
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// router.put('/update/discount/by/id', async(req, res) => {
+//     const {id} = req.body;
+    
+//     try{
+//         const discount = await Discount.findOne({_id: id});
+//         const product = await Product.findOne({_id: discount.productId});
+//         const updatingSlider = await Slider.findByIdAndUpdate(
+//             '674ce6fccefd08dd4b9b8a6b',
+//             { $pull: { products: product._id } },
+//             { new: true }
+//           );
+          
+//         await Discount.findOneAndDelete({_id: id})
+
+//         res.status(200).json({message: 'discount deleted successfuly !', updatingSlider: updatingSlider});
+//     }catch(err){
+//         res.status(500).json({error: err.message})
+//     }
+// })
+
 router.put('/update/discount/by/id', async(req, res) => {
-    const {id} = req.body;
+    const {updatedDiscount} = req.body;
+    console.log(updatedDiscount);
     
     try{
-        const discount = await Discount.findOne({_id: id});
-        const product = await Product.findOne({_id: discount.productId});
-        const updatingSlider = await Slider.findByIdAndUpdate(
-            '674ce6fccefd08dd4b9b8a6b',
-            { $pull: { products: product._id } },
-            { new: true }
-          );
-          
-        await Discount.findOneAndDelete({_id: id})
+        const discount = await Discount.findOneAndUpdate(
+            {_id: updatedDiscount._id},
+            {$set: updatedDiscount},
+            {new: true}
+        );
 
-        res.status(200).json({message: 'discount deleted successfuly !', updatingSlider: updatingSlider});
+        res.status(200).json({message: 'discount updated successfuly !', updatedDiscount: discount});
     }catch(err){
         res.status(500).json({error: err.message})
+        console.log(err);
+        
     }
 })
-
 
 module.exports = router;

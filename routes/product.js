@@ -52,7 +52,8 @@ router.get('/get/product/by/biggestDiscount', async(req, res) => {
         if(discount[0]){
             const products = await Product.find({discount: discount[0]._id});
             res.status(200).json({discount: discount[0], products});
-          //  console.log(discount[0].percentage);
+            
+            console.log(discount[0]);
             
         }else{
             res.status(404).json({error: 'product not found !'})
