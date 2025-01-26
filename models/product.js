@@ -48,7 +48,8 @@ const ProductShema = new mongoose.Schema({
         type: String,
     },
     discount: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId ,
+        default: null,
         ref: 'discounts',
     },
     discountCode: {

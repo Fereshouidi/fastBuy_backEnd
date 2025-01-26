@@ -99,6 +99,35 @@ router.get('/get/products/by/name', async (req, res) => {
     }
 });
 
+router.put('/update/product', async (req, res) => {
+    const { updatedProduct } = req.body;
+    console.log(updatedProduct);
+    
+
+    if (!updatedProduct || !updatedProduct._id) {
+        return res.status(400).json({ error: 'Product ID is required!' });
+    }
+
+    try {
+        const product = await Product.findByIdAndUpdate(
+            updatedProduct._id, 
+            { $set: updatedProduct }, 
+            { new: true, runValidators: true } 
+        ).populate('discount')
+
+        if (!product) {
+            return res.status(404).json({ error: 'Cannot find that product!' });
+        }
+
+        res.status(200).json({ message: 'Product updated successfully!', product });
+        
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.error(err);
+    }
+});
+
+
 router.put('/update/product/categorie', async(req, res) => {
     const {productId, categorieId} = req.body;
 

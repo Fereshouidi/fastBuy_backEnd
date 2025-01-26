@@ -3,25 +3,32 @@ const router = express.Router();
 const Discount = require('../models/discount');
 const Product = require('../models/product');
 const Slider = require('../models/slider');
+const Purchase = require('../models/purchase');
 
 
 
 router.post('/add/discount', async(req, res) => {
     const data = req.body;
-
+    console.log(data);
+    
     try{
-        const product = await Product.findById(data.productId);
-        if(!product.discount){
-            const newDiscount = await new Discount(data);
-            newDiscount.save();
-            await Product.updateMany(
-                {_id: {$in: data.productId}}, 
-                {discount: newDiscount._id}
-            )
-            res.status(201).json(newDiscount);
-        }else{
-            res.status(400).json({error : 'This product already has a discount !'})
+
+        if (!data.newDiscount) {
+            res.status(400).json({error : 'invalid data !'})
         }
+        // const product = await Product.findById(data.productId);
+        // if(!product.discount){
+            const newDiscount = await new Discount(data.newDiscount);
+            newDiscount.save();
+            res.status(201).json(newDiscount);
+        //     await Product.updateMany(
+        //         {_id: {$in: data.productId}}, 
+        //         {discount: newDiscount._id}
+        //     )
+        //     res.status(201).json(newDiscount);
+        // }else{
+        //     res.status(400).json({error : 'This product already has a discount !'})
+        // }
         
     }catch(err){
         res.status(500).json({error: err.message});
@@ -37,6 +44,22 @@ router.get('/get/allDiscounts', async(req, res) => {
         
     }catch(err){
         res.status(500).json({error: err.message});
+    }
+})
+
+router.get('/get/discount/by/id', async(req, res) => {
+
+    const { discountId } = req.query;
+
+    try{
+       
+        const discount = await Discount.findOne({_id: discountId});
+        res.status(200).json(discount);
+        
+    }catch(err){
+        res.status(500).json({error: err.message});
+        console.log(err);
+        
     }
 })
 
@@ -152,5 +175,34 @@ router.put('/update/discount/by/id', async(req, res) => {
         
     }
 })
+
+router.delete('/delete/discount/by/id', async (req, res) => {
+    const { discountId } = req.query;
+
+    try {
+        const discount = await Discount.findById(discountId);
+        if (!discount) {
+            return res.status(404).json({ message: "Discount not found" });
+        }
+
+        await Product.updateMany(
+            { discount: discountId },
+            { $set: { discount: null } }
+        );
+
+        await Purchase.updateMany(
+            { discount: discountId },
+            { $set: { discount: null } }
+        );
+
+        await Discount.findByIdAndDelete(discountId);
+
+        res.status(200).json({ message: "Discount deleted successfully!" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.error(err);
+    }
+});
+
 
 module.exports = router;

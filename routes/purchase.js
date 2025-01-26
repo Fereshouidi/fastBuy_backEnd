@@ -71,15 +71,6 @@ router.post('/put/purchase/in/shoppingCart', async(req, res) => {
         }
 
         if(shoppingCart.length == 1){    
-
-            // for (let index = 0 ; index < shoppingCart?.products?.length ; index++) {
-            //     if (shoppingCart.products[index]._id == product?._id) {
-            //         setProductinShoppingCart(true);
-            //         return;
-            //     } else {
-            //         setProductinShoppingCart(false);
-            //     }
-            // }
             
             if (shoppingCart[0].products.includes(purchase.product)){
                 return res.status(210).json({message: 'purchase is already exist in shoppingCart !', });
@@ -96,7 +87,8 @@ router.post('/put/purchase/in/shoppingCart', async(req, res) => {
 
             await Purchase.findOneAndUpdate(
                 {_id: purchase._id},
-                {shoppingCart: shoppingCart[0]._id}
+                {shoppingCart: shoppingCart[0]._id},
+                {status: 'inShoppingCart'}
             )
 
         }else{
@@ -270,7 +262,8 @@ router.get('/get/purchases/by/customer&product', async(req, res) => {
             buyer: customerId,
             product: productId,
             status: 'cart'
-        });        
+        }).populate('discountCode');
+        console.log(purchases);
         
         res.status(200).json(purchases);
     }catch{

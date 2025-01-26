@@ -28,7 +28,7 @@ const PurchaseSchema = new mongoose.Schema({
     status: {
         type: String,
         default: 'cart',
-        enum: ['cart', 'processing', 'shipped', 'delivered', 'canceled', 'payment_failed', 'returned', 'out_of_stock', 'ready_for_pickup'],
+        enum: ['cart', 'inShoppingCart', 'processing', 'shipped', 'delivered', 'canceled', 'payment_failed', 'returned', 'out_of_stock', 'ready_for_pickup'],
     },
     discountCode: {
         type: mongoose.Schema.Types.ObjectId,
