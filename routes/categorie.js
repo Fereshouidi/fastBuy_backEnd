@@ -30,14 +30,18 @@ router.post('/add/categorie', async (req, res) => {
 
 router.get('/get/categorie/by/id', async (req, res) => {
 
-    const {id} = req.query;
+    const { categorieId } = req.query;
+    console.log(categorieId);
+    
     
     try {
-        const categorie = await Categorie.findOne({_id: id});
+        const categorie = await Categorie.findOne({_id: categorieId});
+
+        console.log(categorie);
 
         if (!categorie) {
             return res.status(404).json("categorie not found !");
-        }
+        }        
 
         res.status(200).json(categorie);
 

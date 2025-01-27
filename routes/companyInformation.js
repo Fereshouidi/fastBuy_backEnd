@@ -148,13 +148,9 @@ router.get('/get/Profit/ofProduct/lastWeek', async(req, res) => {
                 }
             })
         })
-
-       // res.send(purchases)
         
         const getDayEarning_ = (day, purchase) => {
-    
-          //  console.log(purchase);
-            
+                
             const dayStart = new Date(day);
             dayStart.setHours(0, 0, 0, 0);
         
@@ -163,8 +159,6 @@ router.get('/get/Profit/ofProduct/lastWeek', async(req, res) => {
         
             const dailyPurchases = purchase.filter(purchase => {        
                 const purchaseDate = new Date(purchase.createdAt); 
-            //    console.log(purchase);
-
                 return purchaseDate >= dayStart && purchaseDate <= dayEnd;
             });
         

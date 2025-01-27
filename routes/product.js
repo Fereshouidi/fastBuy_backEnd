@@ -5,28 +5,33 @@ const Product = require('../models/product');
 const Review = require('../models/reviews');
 const Discount = require('../models/discount');
 const Categorie = require('../models/categorie');
+const Customer = require('../models/customer');
 const { propfind } = require('./customer');
 // import { uploadImg } from '../DealingWithImages';
 
 router.post('/add/Product', async(req, res) => {
-    const data = req.body;
+    const productData = req.body;
+    
     try{
-        const newProduct = await new Product(data);
+        const newProduct = await new Product(productData);
         await newProduct.save();
         res.status(201).json(newProduct);
     }catch(err){
-        res.status(500).json({error: err.message});
+        res.status(500).json({error: err.message});        
     }
 })
 
-router.get('/get/allProducts', async(req, res) => {
-    try{
-        const allProducts = await Product.find();
+router.get('/get/allProducts', async (req, res) => {
+    try {
+        const allProducts_ = await Product.find();
+        const allProducts = allProducts_.filter((product) => product.visible !== false);
+        
         res.status(200).json(allProducts);
-    }catch{
-        res.status(500).json({error: err});
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
-})
+});
+
 
 router.get('/get/product/byId', async(req, res) => {
     const id = req.query.id;
@@ -52,8 +57,8 @@ router.get('/get/product/by/biggestDiscount', async(req, res) => {
         if(discount[0]){
             const products = await Product.find({discount: discount[0]._id});
             res.status(200).json({discount: discount[0], products});
-            
-            console.log(discount[0]);
+                        
+            console.log('done');
             
         }else{
             res.status(404).json({error: 'product not found !'})
@@ -68,7 +73,8 @@ router.get('/get/products/byRating', async (req, res) => {
     const {page, limit} = req.query;
     const skip = (page - 1) * limit;
     try {
-        const allProducts = await Product.find().sort({ totalRating: -1 }).limit(parseInt(limit)).skip(parseInt(skip)).populate('discount');
+        const allProducts_ = await Product.find().sort({ totalRating: -1 }).limit(parseInt(limit)).skip(parseInt(skip)).populate('discount');
+        const allProducts = allProducts_.filter((product) => product.visible !== false);
 
         res.status(200).json(allProducts);
 
@@ -81,7 +87,7 @@ router.get('/get/products/by/name', async (req, res) => {
     const {searchQuery} = req.query;
 
     try {
-        const products = await Product.find({
+        const products_ = await Product.find({
             $or: [
                 {"name.english": {$regex: searchQuery, $options: 'i'}},
                 {"name.arabic": {$regex: searchQuery, $options: 'i'}}
@@ -89,6 +95,9 @@ router.get('/get/products/by/name', async (req, res) => {
         }).sort({
             totalRating : (-1)
         }).populate('discount')
+
+        const products = products_.filter((product) => product.visible !== false);
+
 
         res.status(200).json(products);
 
@@ -180,9 +189,7 @@ router.put('/update/product/price', async(req, res) => {
 
 router.get('/get/product/for/managementPage', async(req, res) => {
     const {categorieId, searchQuery} = req.query;
-    
-    // console.log(categorieId, searchQuery);
-    
+        
     try{
 
         let categorie = categorieId;
@@ -239,7 +246,8 @@ router.get('/get/product/for/managementPage', async(req, res) => {
         }
 
         if(products){
-            res.status(200).json(products);
+            const products_ = products.filter((product) => product.visible !== false);
+            res.status(200).json(products_);
         }else{
             res.status(404).json({error: 'product not found !'})
         }
@@ -277,7 +285,42 @@ router.put('/update/product/imagePrincipal', async(req, res) => {
         res.status(500).json({error: err});
     }
 })
-// uploadImg
+
+router.delete('/delete/product/by/id/:productId', async (req, res) => {
+    const { productId } = req.params; 
+        
+    if (!productId) {
+        return res.status(400).json({ error: "Product ID is required" });
+    }
+
+    try {
+        const product = await Product.findByIdAndUpdate(
+            productId,
+            { 
+                visible: false,
+                categorie: null, 
+                discount: null
+            },
+        );
+
+        if (!product) {
+            return res.status(404).json({ error: "Product not found" });
+        }
+
+        await Customer.updateMany(
+            {},
+            {$pull: {favorite: productId}}
+        )
+
+        res.status(200).json({ message: "Product has been removed successfully" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log(err);
+        
+    }
+});
+
+
 
 module.exports = router;
 
