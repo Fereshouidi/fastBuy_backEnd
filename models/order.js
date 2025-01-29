@@ -43,6 +43,10 @@ const OrderSchema = mongoose.Schema({
         type: Number,
         default: 0,
     },
+    deleveryBoy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'deleveryBoys'
+    },
     lastUpdate: {
         type: Date,
     },

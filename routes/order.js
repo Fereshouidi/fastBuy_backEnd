@@ -33,10 +33,13 @@ router.post('/add/order', async(req, res) => {
         
         for (const purchase of orderData.purchases) {
             
-            const product = await Product.updateOne(
+            await Product.updateOne(
                 { _id: purchase.product._id },
-                { $inc: { quantity: -purchase.quantity } }
-            );            
+                { 
+                    $inc: { quantity: -purchase.quantity },
+                    $pull: { inPurchases: { $in: orderData.purchases } } 
+                }
+            );     
         }
         
 

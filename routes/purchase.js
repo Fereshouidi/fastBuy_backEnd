@@ -87,8 +87,11 @@ router.post('/put/purchase/in/shoppingCart', async(req, res) => {
 
             await Purchase.findOneAndUpdate(
                 {_id: purchase._id},
-                {shoppingCart: shoppingCart[0]._id},
-                {status: 'inShoppingCart'}
+                {
+                    shoppingCart: shoppingCart[0]._id,
+                    status: 'inShoppingCart',
+                    new: true
+                }
             )
 
         }else{
@@ -123,6 +126,8 @@ router.post('/put/purchase/in/shoppingCart', async(req, res) => {
         
 
         res.status(201).json({message: 'purchase added successfully !', purchase})
+        console.log(purchase);
+        
     }catch(err){
         res.status(500).json({error: err.message});
         console.log(err);
@@ -263,6 +268,26 @@ router.get('/get/purchases/by/customer&product', async(req, res) => {
             product: productId,
             status: 'cart'
         }).populate('discountCode');
+        console.log(purchases);
+        
+        res.status(200).json(purchases);
+    }catch{
+        res.status(500).json({error: err});
+    }
+})
+
+router.get('/get/purchases/by/product', async(req, res) => {
+    const {productId} = req.query;
+    console.log(productId);
+    
+    try{
+        const purchases = await Purchase.find({
+
+            product: productId,
+            status: 'inShoppingCart'
+
+        }).populate('discountCode').populate('buyer')
+        
         console.log(purchases);
         
         res.status(200).json(purchases);

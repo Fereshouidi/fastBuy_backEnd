@@ -32,7 +32,6 @@ router.get('/get/allProducts', async (req, res) => {
     }
 });
 
-
 router.get('/get/product/byId', async(req, res) => {
     const id = req.query.id;
     

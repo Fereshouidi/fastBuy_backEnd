@@ -126,8 +126,6 @@ router.get('/get/Profit/ofProduct/lastWeek', async(req, res) => {
     const {productId} = req.query;
     const today = new Date();
     const dayForCheck = new Date(today);
-
-    console.log(productId);
     
     
     try{
@@ -188,6 +186,56 @@ router.get('/get/Profit/ofProduct/lastWeek', async(req, res) => {
         
     }
 })
+
+router.get('/get/Profit/ofProduct/allTime', async (req, res) => {
+    const { productId } = req.query;
+
+    try {
+        // جلب جميع الطلبات التي تحتوي على المنتج المطلوب
+        const allOrders = await Order.find({ status: 'delivered' }).populate('purchases');
+
+        // استخراج جميع المشتريات التي تحتوي على المنتج المطلوب
+        const purchases = [];
+        allOrders.forEach((order) => {
+            order.purchases.forEach((purchase) => {
+                if (purchase.product == productId) {
+                    purchases.push(purchase);
+                }
+            });
+        });
+
+        // دالة لحساب الأرباح لكل يوم من أيام الأسبوع (الأحد - السبت)
+        const getWeeklyEarnings = (purchases) => {
+            const earningsByDay = Array(7).fill(0); // مصفوفة تحتوي على 7 أيام، كلها تبدأ من الصفر
+
+            purchases.forEach((purchase) => {
+                const purchaseDate = new Date(purchase.createdAt);
+                const dayIndex = purchaseDate.getDay(); // 0 = الأحد، 6 = السبت
+                
+                earningsByDay[dayIndex] += purchase.totalPrice || 0;
+            });
+
+            return [
+                { day: "Sunday", totalEarning: earningsByDay[0] },
+                { day: "Monday", totalEarning: earningsByDay[1] },
+                { day: "Tuesday", totalEarning: earningsByDay[2] },
+                { day: "Wednesday", totalEarning: earningsByDay[3] },
+                { day: "Thursday", totalEarning: earningsByDay[4] },
+                { day: "Friday", totalEarning: earningsByDay[5] },
+                { day: "Saturday", totalEarning: earningsByDay[6] }
+            ];
+        };
+
+        const profits = getWeeklyEarnings(purchases);
+
+        res.status(200).json(profits);
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log(err);
+    }
+});
+
 
 const getDayEarning = (day, orders) => {
     
