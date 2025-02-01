@@ -1,48 +1,63 @@
 const mongoose = require('mongoose');
-const { type } = require('os');
 const bcrypt = require('bcrypt');
 
+const { Schema } = mongoose;
 
-const DeleveryBoySchema = new mongoose.Schema({
-
+const DeleveryBoySchema = new Schema({
     userName: {
         type: String,
+        required: true
     },
     email: {
         type: String,
+        required: true,
+        unique: true
     },
     password: {
         type: String,
+        required: true
     },
     dateOfBirth: {
         type: Date,
     },
-    orders: {
-        type: [mongoose.Schema.Types.ObjectId],
-        ref: 'orders',
-    },
-    adress: {
+    orders: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Order'
+    }],
+    address: {
         type: String,
     },
     phone: {
-        type: Number,
+        type: String,
     },
     activationToken: {
-        type: Number,
+        type: String,
     },
-    token : {
-        type: Number
+    token: {
+        type: String
     },
     verification: {
         type: Boolean,
         default: false
     },
-    timeOfRegister: {
+    type: {
+        type: String,
+        enum: ['employee', 'freelancer']
+    },
+    timeTable: {
+        monday: [Number],
+        tuesday: [Number],
+        wednesday: [Number],
+        thursday: [Number], 
+        friday: [Number],
+        saturday: [Number],
+        sunday: [Number],
+    },
+    createdAt: {
         type: Date,
-        default: Date.now,
+        default: new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000),
     }
-    
-})
+});
 
 DeleveryBoySchema.pre('save', async function (next) {
     if (this.isModified('password')) {
@@ -51,6 +66,5 @@ DeleveryBoySchema.pre('save', async function (next) {
     next();
 });
 
-const DeleveryBoy = mongoose.model('deleveryBoys', DeleveryBoySchema);
+const DeleveryBoy = mongoose.model('DeleveryBoy', DeleveryBoySchema);
 module.exports = DeleveryBoy;
-

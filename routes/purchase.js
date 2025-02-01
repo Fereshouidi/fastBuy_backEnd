@@ -267,7 +267,26 @@ router.get('/get/purchases/by/customer&product', async(req, res) => {
             buyer: customerId,
             product: productId,
             status: 'cart'
-        }).populate('discountCode');
+        }).populate('discountCode').populate('buyer').populate('product');
+        console.log(purchases);
+        
+        res.status(200).json(purchases);
+    }catch{
+        res.status(500).json({error: err});
+    }
+})
+
+router.get('/get/purchases/by/buyer', async(req, res) => {
+    const {customerId} = req.query;
+    
+    try{
+        const purchases = await Purchase.find({
+
+            buyer: customerId,
+            status: 'delivered'
+
+        }).populate('discountCode').populate('buyer')
+        
         console.log(purchases);
         
         res.status(200).json(purchases);
@@ -278,7 +297,6 @@ router.get('/get/purchases/by/customer&product', async(req, res) => {
 
 router.get('/get/purchases/by/product', async(req, res) => {
     const {productId} = req.query;
-    console.log(productId);
     
     try{
         const purchases = await Purchase.find({
@@ -290,6 +308,47 @@ router.get('/get/purchases/by/product', async(req, res) => {
         
         console.log(purchases);
         
+        res.status(200).json(purchases);
+    }catch{
+        res.status(500).json({error: err});
+    }
+})
+
+router.get('/get/delivered/purchases/by/product', async(req, res) => {
+    const {productId} = req.query;
+    
+    try{
+        const purchases = await Purchase.find({
+
+            product: productId,
+            status: 'delivered'
+
+        }).populate('discountCode').populate('buyer');
+
+        console.log(purchases);
+        
+                
+        res.status(200).json(purchases);
+    }catch{
+        res.status(500).json({error: err});
+    }
+})
+
+router.get('/get/delivered/purchases/by/buyer', async(req, res) => {
+    const {buyerId} = req.query;
+    console.log('buyerId :' + buyerId);
+    
+    try{
+        const purchases = await Purchase.find({
+
+            buyer: buyerId,
+            status: 'delivered'
+
+        }).populate('discountCode').populate('buyer');
+
+        console.log(purchases.length);
+        
+                
         res.status(200).json(purchases);
     }catch{
         res.status(500).json({error: err});

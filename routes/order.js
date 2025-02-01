@@ -95,6 +95,119 @@ router.get('/gt/orders/byCustomer', async(req, res) => {
     }
 })
 
+router.get('/gt/allOrders', async(req, res) => {
+    
+    try {
+        
+        const orders = await Order.find().populate([
+            {
+                path: 'purchases',
+                populate: {
+                    path: 'product',
+                    populate: {
+                        path: 'categorie'
+                    }
+                }
+            }, {
+                path: 'products'
+            }, {
+                path: 'customer',
+            }
+            
+        ])
+        
+        
+        res.status(201).json(orders);
+
+    }catch(err) {
+        res.status(500).json({error : err.message})
+        console.log(err);
+        
+    }
+})
+
+router.put('/update/order/status', async (req, res) => {
+    try {
+        const { orderId, newStatus } = req.body;
+
+        if (!orderId || !newStatus) {
+            return res.status(400).json({ error: "Missing orderId or newStatus" });
+        }
+
+        const order = await Order.findById(orderId).populate([
+            { path: 'purchases', populate: { path: 'product', populate: { path: 'categorie' } } },
+            { path: 'products' },
+            { path: 'customer' }
+        ]);
+
+        if (!order) {
+            return res.status(404).json({ error: "Order not found!" });
+        }
+
+        if (order.status === 'delivered' || order.status === 'failed') {
+            return res.status(400).json({ error: "This status can't be changed!" });
+        }
+
+
+        const updatedOrder = await Order.findByIdAndUpdate(
+            orderId,
+            { status: newStatus },
+            { new: true }
+        ).populate([
+            { path: 'purchases', populate: { path: 'product', populate: { path: 'categorie' } } },
+            { path: 'products' },
+            { path: 'customer' }
+        ]);
+
+        if (!updatedOrder) {
+            return res.status(500).json({ error: "Order update failed!" });
+        }
+        
+
+        if (updatedOrder.status === 'delivered') {
+            await Promise.all(
+                order.purchases.map(async (purchase) => {
+                    try {
+                        if (purchase.product && purchase.product._id) {
+                            await Product.findByIdAndUpdate(
+                                purchase.product._id,
+                                { $addToSet: { buyers: order.buyer } },
+                                { new: true }
+                            );
+                        }
+                    } catch (err) {
+                        console.error(" Error updating product buyers:", err);
+                    }
+                })
+            );
+        }
+
+        await Promise.all(
+            order.purchases.map(async (purchase) => {
+                try {
+                    if (purchase._id) {
+                        await Purchase.findByIdAndUpdate(
+                            purchase._id,
+                            { status: newStatus },
+                            { new: true }
+                        );
+                    }
+                } catch (err) {
+                    console.error(" Error updating purchase status:", err);
+                }
+            })
+        );
+
+        console.log(order);
+        
+        res.status(200).json(updatedOrder);
+
+    } catch (err) {
+        console.error(" Server error:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 
 
 
