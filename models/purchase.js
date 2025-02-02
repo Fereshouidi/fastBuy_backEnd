@@ -47,6 +47,14 @@ const PurchaseSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    putItInCart: {
+        type: Date,
+        default: null    
+    },
+    deliveredAt: {
+        type: Date,
+        default: null,    
+    },
     createdAt: {
         type: Date,
         default: Date.now,    

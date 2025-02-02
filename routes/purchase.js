@@ -5,6 +5,7 @@ const Customer = require('../models/customer');
 const Product = require('../models/product');
 const ShoppingCart = require('../models/shoppingCart');
 const CompanyInformations = require('../models/companyInformations');
+const Order = require('../models/order'); 
 
 
 router.post('/add/purchase', async(req, res) => {
@@ -57,7 +58,6 @@ router.post('/put/purchase/in/shoppingCart', async(req, res) => {
 
         const purchase = await Purchase.findById(purchaseId);      
                 
-
         const shoppingCart = await ShoppingCart.find(
             {customer: customerId, status: 'cart'}
         ).populate('purchases')
@@ -91,6 +91,7 @@ router.post('/put/purchase/in/shoppingCart', async(req, res) => {
                 {
                     shoppingCart: shoppingCart[0]._id,
                     status: 'inShoppingCart',
+                    putItInCart: new Date(),
                     new: true
                 }
             )
@@ -115,6 +116,7 @@ router.post('/put/purchase/in/shoppingCart', async(req, res) => {
                 {
                     shoppingCart: newShoppingCart._id,
                     status: 'inShoppingCart',
+                    putItInCart: new Date(),
                     new: true
                 }
             )
@@ -336,11 +338,23 @@ router.get('/get/delivered/purchases/by/product', async(req, res) => {
 
         }).populate('discountCode').populate('buyer');
 
-        console.log(purchases);
+        // console.log(purchases);
+
+        const purchases_ = await Promise.all(
+            purchases.map(async (purchase) => {
+                const order = await Order.findOne({ purchases: { $in: [purchase._id] } });
         
-                
-        res.status(200).json(purchases);
-    }catch{
+                // تحويل الـ purchase إلى كائن عادي وإضافة `orderedAt`
+                return { ...purchase.toObject(), orderedAt: order?.createdAt };
+            })
+        );
+        
+        
+        console.log(purchases_);
+        
+        res.status(200).json(purchases_);
+    }catch(err){
+        console.log((err));
         res.status(500).json({error: err});
     }
 })
