@@ -182,6 +182,19 @@ router.put('/update/order/status', async (req, res) => {
             );
         }
 
+        if (updatedOrder.status === 'failed') {
+            for (const purchase of updatedOrder.purchases) {
+                const product = await Product.findOneAndUpdate(
+                    { _id: purchase.product._id },
+                    { $inc: { quantity: purchase.quantity } },
+                    { new: true }
+                );
+                console.log(product);
+                
+            }
+        }
+        
+
         await Promise.all(
             order.purchases.map(async (purchase) => {
                 try {

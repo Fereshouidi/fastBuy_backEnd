@@ -34,8 +34,8 @@ const DiscountCodeSchema = new mongoose.Schema({
     },
     createdAt: {
         type: Date,
-        default: new Date
-    }
+        default: Date.now,    
+    },
 });
 
 const DiscountCode = mongoose.model('discountCodes', DiscountCodeSchema);

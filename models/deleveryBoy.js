@@ -55,8 +55,8 @@ const DeleveryBoySchema = new Schema({
     },
     createdAt: {
         type: Date,
-        default: new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000),
-    }
+        default: Date.now,    
+    },
 });
 
 DeleveryBoySchema.pre('save', async function (next) {

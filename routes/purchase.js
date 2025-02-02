@@ -55,7 +55,8 @@ router.post('/put/purchase/in/shoppingCart', async(req, res) => {
         
     try{   
 
-        const purchase = await Purchase.findById(purchaseId);        
+        const purchase = await Purchase.findById(purchaseId);      
+                
 
         const shoppingCart = await ShoppingCart.find(
             {customer: customerId, status: 'cart'}
@@ -85,7 +86,7 @@ router.post('/put/purchase/in/shoppingCart', async(req, res) => {
                 {new: true}
             )
 
-            await Purchase.findOneAndUpdate(
+            const updatedPurchase = await Purchase.findOneAndUpdate(
                 {_id: purchase._id},
                 {
                     shoppingCart: shoppingCart[0]._id,
@@ -93,6 +94,9 @@ router.post('/put/purchase/in/shoppingCart', async(req, res) => {
                     new: true
                 }
             )
+
+            console.log(updatedPurchase);
+
 
         }else{
 
@@ -106,9 +110,13 @@ router.post('/put/purchase/in/shoppingCart', async(req, res) => {
             })
             await newShoppingCart.save();
 
-            await Purchase.findOneAndUpdate(
+            const updatedPurchase = await Purchase.findOneAndUpdate(
                 {_id: purchase._id},
-                {shoppingCart: newShoppingCart._id}
+                {
+                    shoppingCart: newShoppingCart._id,
+                    status: 'inShoppingCart',
+                    new: true
+                }
             )
 
             await ShoppingCart.findByIdAndUpdate(
@@ -121,12 +129,15 @@ router.post('/put/purchase/in/shoppingCart', async(req, res) => {
                 {ShoppingCart: newShoppingCart._id},
                 {new: true}
             );
+
+            console.log(updatedPurchase);
+
         }
 
         
 
         res.status(201).json({message: 'purchase added successfully !', purchase})
-        console.log(purchase);
+        //console.log(purchase);
         
     }catch(err){
         res.status(500).json({error: err.message});

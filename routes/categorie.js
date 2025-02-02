@@ -131,13 +131,11 @@ router.get('/get/products/by/categorie', async(req, res) => {
 })
 
 router.put('/rename/categorie/by/id', async (req, res) => {
-    const {categorieId, newName} = req.body;
+    const {categorieId, newName} = req.bdoy;
 
-    console.log(categorieId, newName);
     
     try {
         const categorie = await Categorie.findOne({_id: categorieId});
-        console.log(categorie);
         
 
         if (!categorie) {
