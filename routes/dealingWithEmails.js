@@ -58,4 +58,55 @@ router.post('/send/activationToken', async(req, res) => {
   }
 })
 
+router.post('/send/activationToken/for/admin', async(req, res) => {
+  const {email, adminName, companyEmail, companyPassword, activeLanguage, activationToken} = req.body;
+
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+      user: companyEmail,
+      pass: companyPassword,
+    },
+});
+  
+  try {
+    const activationLink = `https://fast-buy-back-end.vercel.app/api/admin/verification?token=${activationToken}`; 
+
+    const mailOptions_english = {
+        from: companyEmail,
+        to: email,
+        subject: 'Account Activation',
+        html: `
+          <h1>Hello, ${adminName}</h1>
+          <p>Click the link below to activate your account:</p>
+          <a href="${activationLink}">${activationLink}</a>
+        `,
+    };
+    const mailOptions_arabic = {
+      from: companyEmail,
+      to: email,
+      subject: 'تفعيل الحساب',
+      html: `
+        <h1>مرحباً، ${adminName}</h1>
+        <p>اضغط على الرابط أدناه لتفعيل حسابك:</p>
+        <a href="${activationLink}">${activationLink}</a>
+      `,
+    };
+
+    if (activeLanguage === 'english') {
+      await transporter.sendMail(mailOptions_english);
+    } else if (activeLanguage === 'arabic') {
+      await transporter.sendMail(mailOptions_arabic);
+    }
+
+
+    res.status(200).json({message: 'Activation email sent successfully!'});
+
+  } catch (err) {
+    res.status(500).json({message: 'Error sending activation email:', err})
+    console.log(err);
+    
+  }
+})
+
 module.exports = router;

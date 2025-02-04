@@ -17,6 +17,7 @@ const order = require('./routes/order');
 const discountCode = require('./routes/discoundCode');
 const review = require('./routes/review');
 const deleveryBoy = require('./routes/deleveryBoy');
+const Admin = require('./routes/admin');
 
 const PORT = 3002 || process.env.PORT;
 
@@ -42,6 +43,7 @@ app.use('/api', order);
 app.use('/api', discountCode);
 app.use('/api', review);
 app.use('/api', deleveryBoy);
+app.use('/api', Admin);
 
 
 app.listen(PORT, () => {
