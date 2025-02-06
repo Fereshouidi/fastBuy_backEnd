@@ -78,9 +78,39 @@ router.get('/get/admin/byCredentials', async(req, res) => {
     }
 })
 
+router.put('/update/manyAdmins', async (req, res) => {
+    try {
+        const { updatedAdmins } = req.body;
+
+        if (!Array.isArray(updatedAdmins) || updatedAdmins.length === 0) {
+            return res.status(400).json({ error: 'Invalid admins data!' });
+        }
+
+        const updatedAdminsData = await Promise.all(
+            updatedAdmins.map(async (admin) => {
+                if (admin.password) {
+                    const salt = await bcrypt.genSalt(10);
+                    admin.password = await bcrypt.hash(admin.password, salt);
+                }
+                return await Admin.findOneAndUpdate({ _id: admin._id }, admin, { new: true });
+            })
+        );
+
+        res.status(200).json(updatedAdminsData);
+        console.log(updatedAdminsData);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 router.put('/update/admin/by/id', async (req, res) => {
 
-    const { id, updatedAdmin } = req.body;    
+    const { id, updatedAdmin } = req.body; 
+    
+    if (updatedAdmin.password) {
+        const salt = await bcrypt.genSalt(10); 
+        updatedAdmin.password = await bcrypt.hash(updatedAdmin.password, salt);
+    }
 
     try {
         const adupdatedAdminmin_ = await Admin.findOneAndUpdate({_id: id}, updatedAdmin, {new: true});
@@ -100,9 +130,7 @@ router.put('/update/admin/by/id', async (req, res) => {
 
 router.get('/admin/verification', async(req, res) => {
 
-    const { token } = req.query;
-    console.log(token);
-    
+    const { token } = req.query;    
     
     try {
         const admin = await Admin.findOneAndUpdate({token}, {verification: true});
@@ -111,6 +139,26 @@ router.get('/admin/verification', async(req, res) => {
         res.status(500).json({error: err});
     }
 })
+
+router.delete('/delete/manyAdmin', async (req, res) => {
+    const {adminsId} = req.query;
+
+    console.log(adminsId);
+    
+    if (!adminsId) {
+        return res.status(400).json({ error: "No admin IDs provided" });
+    }
+
+    try {
+        await Promise.all(
+            adminsId.map(adminId => Admin.findOneAndDelete({ _id: adminId }))
+        );
+
+        res.status(200).send(`${adminsId.length} admin(s) have been deleted successfully`);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 
 module.exports = router;

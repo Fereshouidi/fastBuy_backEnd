@@ -30,7 +30,7 @@ const AdminSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    permessions: {
+    permissions: {
         type: [String],
         unum: ['statistics', 'productsManagement', 'ordersManegment', 'adminsManegement', 'customersManegment']
     },

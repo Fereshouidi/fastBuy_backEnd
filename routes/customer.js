@@ -85,6 +85,11 @@ router.put('/update/customer', async(req, res) => {
         return res.status(400).json({ error: 'Invalid updatedCustomer value!' });
     }
 
+    if (updatedCustomerData.password) {
+        const salt = await bcrypt.genSalt(10); 
+        updatedCustomerData.password = await bcrypt.hash(updatedCustomerData.password, salt);
+    }
+
     try{
         const updatedCustomer = await Customer.findByIdAndUpdate(
             id, 

@@ -61,6 +61,9 @@ router.post('/send/activationToken', async(req, res) => {
 router.post('/send/activationToken/for/admin', async(req, res) => {
   const {email, adminName, companyEmail, companyPassword, activeLanguage, activationToken} = req.body;
 
+  console.log(email, adminName, companyEmail, companyPassword, activeLanguage, activationToken);
+  
+
   const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
@@ -101,6 +104,8 @@ router.post('/send/activationToken/for/admin', async(req, res) => {
 
 
     res.status(200).json({message: 'Activation email sent successfully!'});
+    console.log('Activation email sent successfully!');
+    
 
   } catch (err) {
     res.status(500).json({message: 'Error sending activation email:', err})
