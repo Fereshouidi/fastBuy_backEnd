@@ -52,13 +52,14 @@ router.get('/get/Profit/lastWeek', async(req, res) => {
             status: 'delivered'
         })
 
-        const day1_Pprofits = getDayEarning(new Date(dayForCheck.setDate(today.getDate() - 7)), ordersLastWeek);
-        const day2_Pprofits = getDayEarning(new Date(dayForCheck.setDate(today.getDate() - 6)), ordersLastWeek);
-        const day3_Pprofits = getDayEarning(new Date(dayForCheck.setDate(today.getDate() - 5)), ordersLastWeek);
-        const day4_Pprofits = getDayEarning(new Date(dayForCheck.setDate(today.getDate() - 4)), ordersLastWeek);
-        const day5_Pprofits = getDayEarning(new Date(dayForCheck.setDate(today.getDate() - 3)), ordersLastWeek);
-        const day6_Pprofits = getDayEarning(new Date(dayForCheck.setDate(today.getDate() - 2)), ordersLastWeek);
-        const day7_Pprofits = getDayEarning(new Date(dayForCheck.setDate(today.getDate() - 1)), ordersLastWeek);
+        const day1_Pprofits = getDayEarning(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7), ordersLastWeek);
+        const day2_Pprofits = getDayEarning(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6), ordersLastWeek);
+        const day3_Pprofits = getDayEarning(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 5), ordersLastWeek);
+        const day4_Pprofits = getDayEarning(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 4), ordersLastWeek);
+        const day5_Pprofits = getDayEarning(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 3), ordersLastWeek);
+        const day6_Pprofits = getDayEarning(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 2), ordersLastWeek);
+        const day7_Pprofits = getDayEarning(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1), ordersLastWeek);
+
         
         res.status(200).json([
             day1_Pprofits, day2_Pprofits, day3_Pprofits, day4_Pprofits, day5_Pprofits, day6_Pprofits, day7_Pprofits
@@ -120,7 +121,6 @@ router.get('/get/Profit/lasMonth', async(req, res) => {
     }
 })
 
-
 router.get('/get/Profit/ofProduct/lastWeek', async(req, res) => {
 
     const {productId} = req.query;
@@ -129,7 +129,7 @@ router.get('/get/Profit/ofProduct/lastWeek', async(req, res) => {
     
     
     try{
-
+        
         const ordersLastWeek = await Order.find({
             createdAt: {
                 $gte: getLastWeek().lastWeekStart,
@@ -146,9 +146,10 @@ router.get('/get/Profit/ofProduct/lastWeek', async(req, res) => {
                 }
             })
         })
-        
+        console.log( purchases.length );
+
         const getDayEarning_ = (day, purchase) => {
-                
+
             const dayStart = new Date(day);
             dayStart.setHours(0, 0, 0, 0);
         
@@ -167,14 +168,17 @@ router.get('/get/Profit/ofProduct/lastWeek', async(req, res) => {
             
             return {totalEarning, day};
         };
+        console.log(new Date(dayForCheck.setDate(today.getDate() - 7)), purchases);
 
-        const day1_Pprofits = getDayEarning_(new Date(dayForCheck.setDate(today.getDate() - 7)), purchases);
-        const day2_Pprofits = getDayEarning_(new Date(dayForCheck.setDate(today.getDate() - 6)), purchases);
-        const day3_Pprofits = getDayEarning_(new Date(dayForCheck.setDate(today.getDate() - 5)), purchases);
-        const day4_Pprofits = getDayEarning_(new Date(dayForCheck.setDate(today.getDate() - 4)), purchases);
-        const day5_Pprofits = getDayEarning_(new Date(dayForCheck.setDate(today.getDate() - 3)), purchases);
-        const day6_Pprofits = getDayEarning_(new Date(dayForCheck.setDate(today.getDate() - 2)), purchases);
-        const day7_Pprofits = getDayEarning_(new Date(dayForCheck.setDate(today.getDate() - 1)), purchases);
+        const day1_Pprofits = getDayEarning_(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7), purchases);
+        const day2_Pprofits = getDayEarning_(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6), purchases);
+        const day3_Pprofits = getDayEarning_(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 5), purchases);
+        const day4_Pprofits = getDayEarning_(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 4), purchases);
+        const day5_Pprofits = getDayEarning_(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 3), purchases);
+        const day6_Pprofits = getDayEarning_(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 2), purchases);
+        const day7_Pprofits = getDayEarning_(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1), purchases);
+        
+        
         
         res.status(200).json([
             day1_Pprofits, day2_Pprofits, day3_Pprofits, day4_Pprofits, day5_Pprofits, day6_Pprofits, day7_Pprofits
@@ -191,10 +195,8 @@ router.get('/get/Profit/ofProduct/allTime', async (req, res) => {
     const { productId } = req.query;
 
     try {
-        // جلب جميع الطلبات التي تحتوي على المنتج المطلوب
         const allOrders = await Order.find({ status: 'delivered' }).populate('purchases');
 
-        // استخراج جميع المشتريات التي تحتوي على المنتج المطلوب
         const purchases = [];
         allOrders.forEach((order) => {
             order.purchases.forEach((purchase) => {
@@ -204,13 +206,12 @@ router.get('/get/Profit/ofProduct/allTime', async (req, res) => {
             });
         });
 
-        // دالة لحساب الأرباح لكل يوم من أيام الأسبوع (الأحد - السبت)
         const getWeeklyEarnings = (purchases) => {
-            const earningsByDay = Array(7).fill(0); // مصفوفة تحتوي على 7 أيام، كلها تبدأ من الصفر
+            const earningsByDay = Array(7).fill(0); 
 
             purchases.forEach((purchase) => {
                 const purchaseDate = new Date(purchase.createdAt);
-                const dayIndex = purchaseDate.getDay(); // 0 = الأحد، 6 = السبت
+                const dayIndex = purchaseDate.getDay(); 
                 
                 earningsByDay[dayIndex] += purchase.totalPrice || 0;
             });
@@ -315,10 +316,10 @@ const getWeekEarnings = (weekStart_, orders) => {
 
 const getStartOfWeek = (date) => {
     const newDate = new Date(date);
-    const dayOfWeek = newDate.getDay(); // اليوم الحالي (0 = الأحد، 6 = السبت)
-    const diff = dayOfWeek; // حساب الفرق للوصول إلى بداية الأسبوع (الأحد)
-    newDate.setDate(newDate.getDate() - diff); // ضبط التاريخ إلى بداية الأسبوع
-    newDate.setHours(0, 0, 0, 0); // تصفير الوقت
+    const dayOfWeek = newDate.getDay(); 
+    const diff = dayOfWeek; 
+    newDate.setDate(newDate.getDate() - diff); 
+    newDate.setHours(0, 0, 0, 0); 
     return newDate;
 };
 

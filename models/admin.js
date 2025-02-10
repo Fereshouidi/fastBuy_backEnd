@@ -32,7 +32,37 @@ const AdminSchema = new mongoose.Schema({
     },
     permissions: {
         type: [String],
-        unum: ['statistics', 'productsManagement', 'ordersManegment', 'adminsManegement', 'customersManegment']
+        unum: ['statistics', 'productsManagement', 'ordersManegment', 'adminsManagement', 'customersManegment']
+    },
+    timeTable: {
+        monday: [{
+            hour: { type: Number, default: null },
+            role: { type: String, default: null }
+        }],
+        tuesday: [{
+            hour: { type: Number, default: null },
+            role: { type: String, default: null }
+        }],
+        wednesday: [{
+            hour: { type: Number, default: null },
+            role: { type: String, default: null }
+        }],
+        thursday: [{
+            hour: { type: Number, default: null },
+            role: { type: String, default: null }
+        }],
+        friday: [{
+            hour: { type: Number, default: null },
+            role: { type: String, default: null }
+        }],
+        saturday: [{
+            hour: { type: Number, default: null },
+            role: { type: String, default: null }
+        }],
+        sunday: [{
+            hour: { type: Number, default: null },
+            role: { type: String, default: null }
+        }],
     },
     createdAt: {
         type: Date,

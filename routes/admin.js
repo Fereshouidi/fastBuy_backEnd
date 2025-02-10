@@ -140,10 +140,34 @@ router.get('/admin/verification', async(req, res) => {
     }
 })
 
+router.put('/update/admin/timeTable', async (req, res) => {
+    const { id, newTimeTable } = req.body; 
+
+    if (!id || !newTimeTable) {
+        return res.status(400).json({ error: "Missing required fields: id or newTimeTable" });
+    }
+
+    try {
+        const updatedAdmin = await Admin.findOneAndUpdate(
+            { _id: id },
+            { timeTable: newTimeTable },
+            { new: true } 
+        );
+
+        if (!updatedAdmin) {
+            return res.status(404).json({ error: "Admin not found !" });
+        }
+
+        return res.status(200).json(updatedAdmin);
+
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: err.message });
+    }
+});
+
 router.delete('/delete/manyAdmin', async (req, res) => {
     const {adminsId} = req.query;
-
-    console.log(adminsId);
     
     if (!adminsId) {
         return res.status(400).json({ error: "No admin IDs provided" });
@@ -159,6 +183,5 @@ router.delete('/delete/manyAdmin', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-
 
 module.exports = router;

@@ -96,9 +96,6 @@ router.post('/put/purchase/in/shoppingCart', async(req, res) => {
                 }
             )
 
-            console.log(updatedPurchase);
-
-
         }else{
 
             const companyInformations = await CompanyInformations.find();
@@ -132,14 +129,9 @@ router.post('/put/purchase/in/shoppingCart', async(req, res) => {
                 {new: true}
             );
 
-            console.log(updatedPurchase);
-
         }
 
-        
-
         res.status(201).json({message: 'purchase added successfully !', purchase})
-        //console.log(purchase);
         
     }catch(err){
         res.status(500).json({error: err.message});
@@ -338,8 +330,6 @@ router.get('/get/delivered/purchases/by/product', async(req, res) => {
 
         }).populate('discountCode').populate('buyer');
 
-        // console.log(purchases);
-
         const purchases_ = await Promise.all(
             purchases.map(async (purchase) => {
                 const order = await Order.findOne({ purchases: { $in: [purchase._id] } });
@@ -349,9 +339,7 @@ router.get('/get/delivered/purchases/by/product', async(req, res) => {
             })
         );
         
-        
-        console.log(purchases_);
-        
+                
         res.status(200).json(purchases_);
     }catch(err){
         console.log((err));

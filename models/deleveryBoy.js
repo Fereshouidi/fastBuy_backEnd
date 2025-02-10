@@ -45,13 +45,34 @@ const DeleveryBoySchema = new Schema({
         enum: ['employee', 'freelancer']
     },
     timeTable: {
-        monday: [Number],
-        tuesday: [Number],
-        wednesday: [Number],
-        thursday: [Number], 
-        friday: [Number],
-        saturday: [Number],
-        sunday: [Number],
+        monday: [{
+            hour: { type: Number, default: null },
+            role: { type: String, default: null }
+        }],
+        tuesday: [{
+            hour: { type: Number, default: null },
+            role: { type: String, default: null }
+        }],
+        wednesday: [{
+            hour: { type: Number, default: null },
+            role: { type: String, default: null }
+        }],
+        thursday: [{
+            hour: { type: Number, default: null },
+            role: { type: String, default: null }
+        }],
+        friday: [{
+            hour: { type: Number, default: null },
+            role: { type: String, default: null }
+        }],
+        saturday: [{
+            hour: { type: Number, default: null },
+            role: { type: String, default: null }
+        }],
+        sunday: [{
+            hour: { type: Number, default: null },
+            role: { type: String, default: null }
+        }],
     },
     createdAt: {
         type: Date,
