@@ -10,14 +10,17 @@ router.post('/add/order', async(req, res) => {
 
     const orderData = req.body;
 
+    //console.log(orderData);
+    
+
     try {
         const newOrder = await new Order({
             ...orderData, 
-            customer: orderData.customer._id,
+            customer: orderData.customer,
             createdAt: new Date
         });
         newOrder.save();
-    
+        
         
         await ShoppingCart.findOneAndDelete({_id: orderData._id});
 
@@ -30,8 +33,10 @@ router.post('/add/order', async(req, res) => {
             { _id: { $in: orderData.purchases } },
             { status: 'processing' }
         );
+      
+        const purchases = await Purchase.find({ _id: { $in: orderData.purchases } }).populate('product');    
         
-        for (const purchase of orderData.purchases) {
+        for (const purchase of purchases) {
             
             await Product.updateOne(
                 { _id: purchase.product._id },
@@ -48,8 +53,8 @@ router.post('/add/order', async(req, res) => {
             await Customer.findOneAndUpdate(
                 {_id: orderData.customer},
                 {   
-                    adress: orderData.customer.adress ,
-                    phone: orderData.customer.phone
+                    adress: customer.adress ,
+                    phone: customer.phone
                 }
             );
 
@@ -59,6 +64,7 @@ router.post('/add/order', async(req, res) => {
 
     }catch(err) {
         res.status(500).json({error : err.message});
+        console.log(err);
     }
 })
 

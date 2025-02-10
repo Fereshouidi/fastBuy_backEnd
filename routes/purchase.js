@@ -11,6 +11,8 @@ const Order = require('../models/order');
 router.post('/add/purchase', async(req, res) => {
 
     const purchase_data = req.body;    
+    //console.log(purchase_data);
+    
 
     if (!purchase_data.product) {
         return res.status(400).json({error: 'product id is necessary !'});
@@ -334,7 +336,6 @@ router.get('/get/delivered/purchases/by/product', async(req, res) => {
             purchases.map(async (purchase) => {
                 const order = await Order.findOne({ purchases: { $in: [purchase._id] } });
         
-                // تحويل الـ purchase إلى كائن عادي وإضافة `orderedAt`
                 return { ...purchase.toObject(), orderedAt: order?.createdAt };
             })
         );

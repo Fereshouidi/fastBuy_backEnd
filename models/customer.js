@@ -17,10 +17,10 @@ const CustomerSchema = new mongoose.Schema({
     dateOfBirth: {
         type: Date,
     },
-    purchases: {
-        type: [mongoose.Schema.Types.ObjectId],
-        ref: 'purchases',
-    },
+    // purchases: {
+    //     type: [mongoose.Schema.Types.ObjectId],
+    //     ref: 'purchases',
+    // },
     ShoppingCart: {
         type: mongoose.Schema.Types.ObjectId || null,
         ref: 'shoppingCarts',
