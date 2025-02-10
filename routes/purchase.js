@@ -53,94 +53,157 @@ router.post('/add/purchase', async(req, res) => {
     }
 })
 
-router.post('/put/purchase/in/shoppingCart', async(req, res) => {
-    const {purchaseId, customerId} = req.body;    
+// router.post('/put/purchase/in/shoppingCart', async(req, res) => {
+//     const {purchaseId, customerId} = req.body;    
         
-    try{   
+//     try{   
 
-        const purchase = await Purchase.findById(purchaseId);      
+//         const purchase = await Purchase.findById(purchaseId);      
                 
-        const shoppingCart = await ShoppingCart.find(
-            {customer: customerId, status: 'cart'}
-        ).populate('purchases')
+//         const shoppingCart = await ShoppingCart.find(
+//             {customer: customerId, status: 'cart'}
+//         ).populate('purchases')
         
         
-        const getTotalPrice = (shoppingCart) => {
-            let totalPrice = 0;
-            shoppingCart.purchases.forEach(purchase => {
-                totalPrice = totalPrice + purchase.totalPrice
-            });
-            return totalPrice;
+//         const getTotalPrice = (shoppingCart) => {
+//             let totalPrice = 0;
+//             shoppingCart.purchases.forEach(purchase => {
+//                 totalPrice = totalPrice + purchase.totalPrice
+//             });
+//             return totalPrice;
+//         }
+
+//         if(shoppingCart.length == 1){    
+            
+//             if (shoppingCart[0].products.includes(purchase.product)){
+//                 return res.status(210).json({message: 'purchase is already exist in shoppingCart !', });
+//             }
+
+//             await ShoppingCart.findByIdAndUpdate(
+//                 {_id: shoppingCart[0]._id},
+//                 {
+//                     $push: {purchases: purchase, products: purchase.product}, 
+//                     totalPrice : getTotalPrice(shoppingCart[0]) + purchase.totalPrice,
+//                     lastUpdate: new Date},
+//                 {new: true}
+//             )
+
+//             const updatedPurchase = await Purchase.findOneAndUpdate(
+//                 {_id: purchase._id},
+//                 {
+//                     shoppingCart: shoppingCart[0]._id,
+//                     status: 'inShoppingCart',
+//                     putItInCart: new Date(),
+//                     new: true
+//                 }
+//             )
+
+//         }else{
+
+//             const companyInformations = await CompanyInformations.find();
+
+//             const newShoppingCart = await new ShoppingCart({
+//                 customer: customerId,
+//                 purchases: purchase,
+//                 products: [ purchase.product],
+//                 shippingCost: companyInformations[0].shippingCost
+//             })
+//             await newShoppingCart.save();
+
+//             const updatedPurchase = await Purchase.findOneAndUpdate(
+//                 {_id: purchase._id},
+//                 {
+//                     shoppingCart: newShoppingCart._id,
+//                     status: 'inShoppingCart',
+//                     putItInCart: new Date(),
+//                     new: true
+//                 }
+//             )
+
+//             await ShoppingCart.findByIdAndUpdate(
+//                 {_id: newShoppingCart._id},
+//                 {totalPrice : getTotalPrice(newShoppingCart)}
+//             )
+            
+//             await Customer.findByIdAndUpdate(
+//                 {_id: customerId},
+//                 {ShoppingCart: newShoppingCart._id},
+//                 {new: true}
+//             );
+
+//         }
+
+//         res.status(201).json({message: 'purchase added successfully !', purchase})
+        
+//     }catch(err){
+//         res.status(500).json({error: err.message});
+//         console.log(err);
+//     }
+// })
+
+router.post('/put/purchase/in/shoppingCart', async (req, res) => {
+    const { purchaseId, customerId } = req.body;
+
+    try {
+        // جلب بيانات الشراء مباشرة
+        const purchase = await Purchase.findById(purchaseId);
+        if (!purchase) {
+            return res.status(404).json({ message: 'Purchase not found!' });
         }
 
-        if(shoppingCart.length == 1){    
-            
-            if (shoppingCart[0].products.includes(purchase.product)){
-                return res.status(210).json({message: 'purchase is already exist in shoppingCart !', });
+        // جلب سلة التسوق الحالية للعميل
+        let shoppingCart = await ShoppingCart.findOne(
+            { customer: customerId, status: 'cart' }
+        ).populate('purchases');
+
+        if (shoppingCart) {
+            // التحقق مما إذا كان المنتج موجودًا بالفعل
+            if (shoppingCart.products.includes(purchase.product)) {
+                return res.status(210).json({ message: 'Purchase is already in shoppingCart!' });
             }
 
-            await ShoppingCart.findByIdAndUpdate(
-                {_id: shoppingCart[0]._id},
-                {
-                    $push: {purchases: purchase, products: purchase.product}, 
-                    totalPrice : getTotalPrice(shoppingCart[0]) + purchase.totalPrice,
-                    lastUpdate: new Date},
-                {new: true}
-            )
+            // تحديث السلة بإضافة الشراء والمنتج
+            shoppingCart.purchases.push(purchase);
+            shoppingCart.products.push(purchase.product);
+            shoppingCart.totalPrice += purchase.totalPrice;
+            shoppingCart.lastUpdate = new Date();
 
-            const updatedPurchase = await Purchase.findOneAndUpdate(
-                {_id: purchase._id},
-                {
-                    shoppingCart: shoppingCart[0]._id,
-                    status: 'inShoppingCart',
-                    putItInCart: new Date(),
-                    new: true
-                }
-            )
+            await shoppingCart.save();
+        } else {
+            // جلب تكلفة الشحن من الشركة
+            const companyInfo = await CompanyInformations.findOne();
+            const shippingCost = companyInfo ? companyInfo.shippingCost : 0;
 
-        }else{
-
-            const companyInformations = await CompanyInformations.find();
-
-            const newShoppingCart = await new ShoppingCart({
+            // إنشاء سلة تسوق جديدة
+            shoppingCart = new ShoppingCart({
                 customer: customerId,
-                purchases: purchase,
-                products: [ purchase.product],
-                shippingCost: companyInformations[0].shippingCost
-            })
-            await newShoppingCart.save();
+                purchases: [purchase],
+                products: [purchase.product],
+                shippingCost: shippingCost,
+                totalPrice: purchase.totalPrice,
+                lastUpdate: new Date()
+            });
 
-            const updatedPurchase = await Purchase.findOneAndUpdate(
-                {_id: purchase._id},
-                {
-                    shoppingCart: newShoppingCart._id,
-                    status: 'inShoppingCart',
-                    putItInCart: new Date(),
-                    new: true
-                }
-            )
+            await shoppingCart.save();
 
-            await ShoppingCart.findByIdAndUpdate(
-                {_id: newShoppingCart._id},
-                {totalPrice : getTotalPrice(newShoppingCart)}
-            )
-            
-            await Customer.findByIdAndUpdate(
-                {_id: customerId},
-                {ShoppingCart: newShoppingCart._id},
-                {new: true}
-            );
-
+            // تحديث العميل بربطه بالسلة الجديدة
+            await Customer.findByIdAndUpdate(customerId, { ShoppingCart: shoppingCart._id }, { new: true });
         }
 
-        res.status(201).json({message: 'purchase added successfully !', purchase})
-        
-    }catch(err){
-        res.status(500).json({error: err.message});
-        console.log(err);
-        
+        // تحديث بيانات الشراء
+        await Purchase.findByIdAndUpdate(purchase._id, {
+            shoppingCart: shoppingCart._id,
+            status: 'inShoppingCart',
+            putItInCart: new Date(),
+        }, { new: true });
+
+        res.status(201).json({ message: 'Purchase added successfully!', purchase });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
     }
-})
+});
+
 
 router.post('/add/purchase/and/putItInShoppingCart', async(req, res) => {
     const purchase_data = req.body;    
