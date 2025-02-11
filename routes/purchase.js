@@ -274,7 +274,6 @@ router.get('/get/purchases/by/customer&product', async(req, res) => {
             product: productId,
             status: 'cart'
         }).populate('discountCode').populate('buyer').populate('product');
-        console.log(purchases);
         
         res.status(200).json(purchases);
     }catch{

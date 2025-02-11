@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { type } = require('os');
 
 const OrderSchema = mongoose.Schema({
     customer: {
@@ -43,10 +44,14 @@ const OrderSchema = mongoose.Schema({
         type: Number,
         default: 0,
     },
-    deleveryBoy: {
+    deliveryBoy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'deleveryBoys'
     },
+    assignedAt: {
+        type: Date,
+        default: Date.now
+    } ,
     lastUpdate: {
         type: Date,
     },

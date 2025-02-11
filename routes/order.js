@@ -5,13 +5,11 @@ const ShoppingCart = require('../models/shoppingCart');
 const Purchase = require('../models/purchase');
 const Customer = require('../models/customer');
 const Product = require('../models/product');
+const path = require('path');
 
 router.post('/add/order', async(req, res) => {
 
     const orderData = req.body;
-
-    //console.log(orderData);
-    
 
     try {
         const newOrder = await new Order({
@@ -87,6 +85,8 @@ router.get('/gt/orders/byCustomer', async(req, res) => {
                 path: 'products'
             }, {
                 path: 'customer',
+            }, {
+                path: 'discountCode'
             }
             
         ]).sort({createdAt: -1})
@@ -118,6 +118,8 @@ router.get('/gt/allOrders', async(req, res) => {
                 path: 'products'
             }, {
                 path: 'customer',
+            }, {
+                path: 'discountCode'
             }
             
         ])

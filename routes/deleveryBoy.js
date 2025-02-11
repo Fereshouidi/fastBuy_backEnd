@@ -41,6 +41,22 @@ router.get('/get/all/deleveryBoys', async(req, res) => {
    }
 })
 
+router.get('/get/deliveryBoy/by/id/:id/', async(req, res) => {
+      
+    const { id } = req.params;
+    console.log(' hhhhhhhh: ' + id);
+    
+
+    try{
+        const deleveryBoy = await DeleveryBoy.findById(id);
+        res.status(200).json(deleveryBoy);
+ 
+    }catch(err){
+        res.status(500).json({error: err.message});
+        console.log(err);
+    }
+ })
+
 router.put('/update/manyDeliveryBoys', async (req, res) => {
     try {
         const { updatedDeliveryBoys } = req.body;
