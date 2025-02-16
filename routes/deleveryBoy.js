@@ -1,6 +1,7 @@
 
 const express = require('express');
 const DeleveryBoy = require('../models/deleveryBoy');
+const Order = require('../models/order');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 
@@ -29,23 +30,76 @@ router.post('/add/deleveryBoy', async(req, res) => {
     }
 })
 
-router.get('/get/all/deleveryBoys', async(req, res) => {
-      
-   try{
-       const allDeleveryBoys = await DeleveryBoy.find();
-       res.status(200).json(allDeleveryBoys);
+router.get('/get/all/deleveryBoys', async (req, res) => {
+    try {
+         const allDeleveryBoys = await DeleveryBoy.find();
+         const updatedDeliveryBoys = await Promise.all(
+             allDeleveryBoys.map(async (deliveryBoy) => {
+                const ordersProcessing = await Order.find({ deliveryBoy: deliveryBoy, status: {$nin: ['delivered', 'failed']} })            
+                .populate([
+                    {
+                        path: 'purchases',
+                        populate: {
+                            path: 'product',
+                            populate: {
+                                path: 'categorie'
+                            }
+                        }
+                    },
+                    { path: 'products' },
+                    { path: 'customer' },
+                    { path: 'discountCode' },
+                    {
+                        path: 'deliveryBoy',
+                        options: { strictPopulate: false }
+                    },
+                    {
+                        path: 'assignedAt',
+                        options: { strictPopulate: false }
+                    }
+                ])
+                const ordersDelivered = await Order.find({ deliveryBoy: deliveryBoy, status: 'delivered' })
+                .populate([
+                    {
+                        path: 'purchases',
+                        populate: {
+                            path: 'product',
+                            populate: {
+                                path: 'categorie'
+                            }
+                        }
+                    },
+                    { path: 'products' },
+                    { path: 'customer' },
+                    { path: 'discountCode' },
+                    {
+                        path: 'deliveryBoy',
+                        options: { strictPopulate: false }
+                    },
+                    {
+                        path: 'assignedAt',
+                        options: { strictPopulate: false }
+                    }
+                ])
 
-   }catch(err){
-       res.status(500).json({error: err.message});
-       console.log(err);
-   }
-})
-
+                return {
+                    ...deliveryBoy.toObject(), 
+                    ordersProcessing: ordersProcessing,
+                    ordersDelivered: ordersDelivered 
+                };
+             })
+         );
+          
+         res.status(200).json(updatedDeliveryBoys);
+    } catch (err) {
+         res.status(500).json({ error: err.message });
+         console.log(err);
+    }
+ });
+ 
 router.get('/get/deliveryBoy/by/id/:id/', async(req, res) => {
       
-    const { id } = req.params;
-    console.log(' hhhhhhhh: ' + id);
-    
+    const { id } = req.params;    
 
     try{
         const deleveryBoy = await DeleveryBoy.findById(id);
@@ -57,7 +111,7 @@ router.get('/get/deliveryBoy/by/id/:id/', async(req, res) => {
     }
  })
 
-router.put('/update/manyDeliveryBoys', async (req, res) => {
+router.patch('/update/manyDeliveryBoys', async (req, res) => {
     try {
         const { updatedDeliveryBoys } = req.body;
 
@@ -81,7 +135,6 @@ router.put('/update/manyDeliveryBoys', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-
 
 router.put('/update/deleveryBoy/timeTable', async (req, res) => {
     const { id, newTimeTable } = req.body; 
@@ -126,4 +179,5 @@ router.delete('/delete/manyDeliveryBoys', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
 module.exports = router;

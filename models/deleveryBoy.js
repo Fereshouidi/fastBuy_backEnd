@@ -87,5 +87,5 @@ DeleveryBoySchema.pre('save', async function (next) {
     next();
 });
 
-const DeleveryBoy = mongoose.model('DeleveryBoy', DeleveryBoySchema);
+const DeleveryBoy = mongoose.model('DeleveryBoys', DeleveryBoySchema);
 module.exports = DeleveryBoy;

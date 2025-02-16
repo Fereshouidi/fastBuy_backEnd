@@ -46,7 +46,7 @@ const OrderSchema = mongoose.Schema({
     },
     deliveryBoy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'deleveryBoys'
+        ref: 'DeleveryBoys'
     },
     assignedAt: {
         type: Date,

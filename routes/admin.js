@@ -78,7 +78,7 @@ router.get('/get/admin/byCredentials', async(req, res) => {
     }
 })
 
-router.put('/update/manyAdmins', async (req, res) => {
+router.patch('/update/manyAdmins', async (req, res) => {
     try {
         const { updatedAdmins } = req.body;
 

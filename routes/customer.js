@@ -3,6 +3,9 @@ const express = require('express');
 const Customer = require('../models/customer');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const Purchase = require('../models/purchase');
+const Order = require('../models/order');
+const { populate } = require('../models/shoppingCart');
 
 
 router.post('/add/customer', async(req, res) => {
@@ -19,9 +22,52 @@ router.post('/add/customer', async(req, res) => {
 
 router.get('/get/allCustomers', async(req, res) => {
     try{
-        const allCustomers = await Customer.find();
-        res.status(200).json(allCustomers);
-    }catch{
+        const allCustomers = await Customer.find()
+        .populate([{
+            path: 'ShoppingCart',
+            populate: {
+                path: 'purchases',
+                populate: {
+                    path: 'product',
+                    populate: {
+                        path: 'discount'
+                    }
+                },
+                
+            },
+        }])
+        .populate([{
+            path: 'favorite',
+            populate: {
+                path: 'discount'
+            }
+        }])
+        
+        const allCustomers_ = await Promise.all(
+            allCustomers.map( async (customer) => {
+                const ordersDelivered_ = await Order.find({ customer: customer._id, status: "delivered" })
+                .populate([{
+                    path: 'purchases',
+                    populate: {
+                        path: 'product',
+                        populate: {
+                            path: 'discount'
+                        }
+                    }
+                }]);
+            
+
+                if (ordersDelivered_.purchases != []) {
+                    console.log( 'ordersDelivered_ : ' + ordersDelivered_);
+                    
+                }
+                return { ...customer.toObject(), historique: ordersDelivered_ };
+            })
+
+        )
+
+        res.status(200).json(allCustomers_);
+    }catch(err) {
         res.status(500).json({error: err});
     }
 })
@@ -161,6 +207,53 @@ router.get('/account/verification', async(req, res) => {
         res.status(500).json({error: err});
     }
 })
+
+router.patch('/update/manyCustomers', async (req, res) => {
+
+    try {
+        const { updatedCustomers } = req.body;
+
+        console.log(updatedCustomers);
+        
+
+        if (!Array.isArray(updatedCustomers) || updatedCustomers.length === 0) {
+            return res.status(400).json({ error: 'Invalid customers data!' });
+        }
+
+        const updatedCustomersData = await Promise.all(
+            updatedCustomers.map(async (customer) => {
+                if (customer.password) {
+                    const salt = await bcrypt.genSalt(10);
+                    customer.password = await bcrypt.hash(customer.password, salt);
+                }
+                return await Customer.findOneAndUpdate({ _id: customer._id }, customer, { new: true });
+            })
+        );
+
+        res.status(200).json(updatedCustomersData);
+        console.log(updatedCustomersData);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.delete('/delete/manyCustomer', async (req, res) => {
+    const {customersId} = req.query;
+    
+    if (!customersId) {
+        return res.status(400).json({ error: "No customer IDs provided" });
+    }
+
+    try {
+        await Promise.all(
+            customersId.map(customerId => Customer.findOneAndDelete({ _id: customerId }))
+        );
+
+        res.status(200).send(`${customersId.length} customer(s) have been deleted successfully`);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 
 module.exports = router;
