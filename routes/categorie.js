@@ -3,6 +3,8 @@ const router = express.Router();
 const Categorie = require('../models/categorie');
 const CategoriesSection = require('../models/categoriesSection');
 const Product = require('../models/product');
+const { ObjectId } = require('mongoose').Types;
+
 
 router.post('/add/categorie', async (req, res) => {
     const categorieData = req.body;
@@ -28,6 +30,122 @@ router.post('/add/categorie', async (req, res) => {
     }
 });
 
+router.put('/aply/discountCode/on/categories', async (req, res) => {
+
+    const { discountCodeId, categoriesId } = req.body;
+    
+    try {
+
+        const categorie = await Categorie.findOneAndUpdate(
+            { _id: categoriesId },
+            { discountCode: discountCodeId },
+            { new: true }
+        );
+        
+        let updatedProductsNum = 0;
+
+        const getCategoryHierarchy = async (categoryId, discountCodeId) => {
+            const parentCategory = await Categorie.findOne({ _id: categoryId });
+        
+            if (!parentCategory) return { categoriesList: [], updatedProducts: [] };
+        
+            let categoriesList = [parentCategory];
+
+                            
+            const updatedParent = await Product.updateMany(
+                { categorie: parentCategory._id },
+                { discountCode: discountCodeId },
+                { new: true }
+            );
+
+            updatedProductsNum++;  
+        
+            if (parentCategory.childrenCategories && parentCategory.childrenCategories.length > 0) {                              
+
+                for (const childId of parentCategory.childrenCategories) { 
+                        
+                    const updateResult = await Product.updateMany(
+                        { categorie: childId },
+                        { $set: { discountCode: discountCodeId } },                        
+                        { new: true }
+                    );
+
+                    if (updateResult.nModified > 0) {
+                        updatedProductsNum += updateResult.nModified;
+                    }                    
+                }
+            }
+        
+            return updatedProductsNum;
+        };
+        
+        const updatedProducts = await getCategoryHierarchy(categoriesId, discountCodeId);
+                
+        res.status(200).json({message: 'Discount code applied successfully!', updatedProducts: updatedProducts});
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log(err);
+    }
+});
+
+router.put('/undo/discountCode/on/categories', async (req, res) => {
+    const { discountCodeId, categoriesId } = req.body;
+    
+    try {
+        const getCategoryHierarchy = async (categoryId, discountCodeId) => {
+            let updatedProductsNum = 0;
+
+            const parentCategory = await Categorie.findOne({ _id: categoryId });
+
+            if (!parentCategory) return 0;
+        
+            const updatedParent = await Product.updateMany(
+                { 
+                    categorie: parentCategory._id,
+                    discountCode: discountCodeId
+                },
+                { $unset: { discountCode: 1 } }
+            );
+
+            updatedProductsNum += updatedParent.modifiedCount;  
+        
+            if (parentCategory.childrenCategories && parentCategory.childrenCategories.length > 0) {                              
+                for (const childId of parentCategory.childrenCategories) { 
+                    const updateResult = await Product.updateMany(
+                        { 
+                            categorie: childId,
+                            discountCode: discountCodeId
+                        },
+                        { $unset: { discountCode: 1 } }
+                    );
+
+                    updatedProductsNum += updateResult.modifiedCount;                  
+                }
+            }
+        
+            return updatedProductsNum;
+        };
+        
+        const updatedProducts = await getCategoryHierarchy(categoriesId, discountCodeId);
+
+        await Categorie.findOneAndUpdate(
+            { _id: categoriesId },
+            { $unset: { discountCode: 1 } },
+            { new: true }
+        );
+
+        res.status(200).json({
+            message: 'Discount code removed successfully!',
+            updatedProducts: updatedProducts
+        });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log(err);
+    }
+});
+
 router.get('/get/categorie/by/id', async (req, res) => {
 
     const { categorieId } = req.query;
@@ -35,7 +153,7 @@ router.get('/get/categorie/by/id', async (req, res) => {
     
     
     try {
-        const categorie = await Categorie.findOne({_id: categorieId});
+        const categorie = await Categorie.findOne({_id: categorieId}).populate('discountCode');
 
         console.log(categorie);
 
@@ -84,7 +202,7 @@ router.get('/get/categories/by/parent', async (req, res) => {
 
     const {parentId} = req.query;
     try {
-        const categories = await Categorie.find({parentCategorie: parentId});
+        const categories = await Categorie.find({parentCategorie: parentId}).populate('discountCode');
         res.status(200).json(categories)
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -95,7 +213,7 @@ router.get('/get/categories/by/id', async (req, res) => {
 
     const {id} = req.query;
     try {
-        const categorie = await Categorie.find({_id: id});
+        const categorie = await Categorie.find({_id: id}).populate('discountCode');
         res.status(200).json(categorie)
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -131,10 +249,13 @@ router.get('/get/products/by/categorie', async(req, res) => {
 })
 
 router.put('/rename/categorie/by/id', async (req, res) => {
-    const {categorieId, newName} = req.bdoy;
-
     
+    console.log(req.body);
+
+    const {categorieId, newName} = req.body;
+
     try {
+
         const categorie = await Categorie.findOne({_id: categorieId});
         
 
@@ -218,3 +339,7 @@ router.delete('/delete/categorie/by/id/:categorieId', async (req, res) => {
 
 
 module.exports = router;
+
+
+
+

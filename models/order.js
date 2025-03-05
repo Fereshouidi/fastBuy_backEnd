@@ -50,7 +50,7 @@ const OrderSchema = mongoose.Schema({
     },
     assignedAt: {
         type: Date,
-        default: Date.now
+        default: null
     } ,
     lastUpdate: {
         type: Date,

@@ -32,7 +32,7 @@ const AdminSchema = new mongoose.Schema({
     },
     permissions: {
         type: [String],
-        unum: ['statistics', 'productsManagement', 'ordersManegment', 'adminsManagement', 'customersManegment']
+        unum: ['statistics', 'productsManagement', 'ordersManegment', 'adminsManagement', 'customersManegment', 'companyManagement']
     },
     timeTable: {
         monday: [{

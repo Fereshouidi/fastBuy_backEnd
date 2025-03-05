@@ -39,6 +39,7 @@ const ProductShema = new mongoose.Schema({
     },
     categorie: {
         type: mongoose.Schema.Types.ObjectId,
+        default: 'categories',
         ref: 'categories',
     },
     images: {
@@ -53,7 +54,7 @@ const ProductShema = new mongoose.Schema({
         ref: 'discounts',
     },
     discountCode: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId || null,
         ref: 'discountCodes',
     },
     inPurchases: {

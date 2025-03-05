@@ -23,7 +23,7 @@ router.post('/add/Product', async(req, res) => {
 
 router.get('/get/allProducts', async (req, res) => {
     try {
-        const allProducts_ = await Product.find();
+        const allProducts_ = await Product.find().populate('discount')
         const allProducts = allProducts_.filter((product) => product.visible !== false);
         
         res.status(200).json(allProducts);
@@ -36,7 +36,10 @@ router.get('/get/product/byId', async(req, res) => {
     const id = req.query.id;
     
     try{
-        const product = await Product.findById(id).populate('discount').populate('categorie').populate('discountCode');
+        const product = await Product.findById(id)
+            .populate('discount')
+            .populate('categorie')
+            .populate('discountCode');
 
         if(product){
             res.status(200).json(product);
@@ -93,7 +96,10 @@ router.get('/get/products/by/name', async (req, res) => {
             ]
         }).sort({
             totalRating : (-1)
-        }).populate('discount')
+        })
+        .populate('discount')
+        .populate('categorie')
+        .populate('discountCode');
 
         const products = products_.filter((product) => product.visible !== false);
 
@@ -199,25 +205,25 @@ router.get('/get/product/for/managementPage', async(req, res) => {
         const categories = [];
         const stack = [categorieId];
 
-        while (stack.length > 0){
+        while (stack.length > 0) {
             const currentId = stack.pop();
             categories.push(currentId);
-
+        
             if (currentId) {
-                const currentCategorie = await Categorie.find({_id: currentId}).populate('childrenCategories');
-
-                if(currentCategorie && currentCategorie.childrenCategories){
-                    const childrenCategorie = currentCategorie.childrenCategories.map((child) => child._id);
-                    stack.push(...childrenCategorie);
+                const currentCategorie = await Categorie.findOne({ _id: currentId }).exec(); 
+                
+                if (currentCategorie && currentCategorie.childrenCategories) {
+                    stack.push(...currentCategorie.childrenCategories);
                 }
             }
         }
+        
 
         let products = [];
-
+        
         if (categorie?.parentCategorie && searchQuery) {
             products = (await Product.find({
-                categorie: { $in: categorieId }, 
+                categorie: { $in: categories }, 
                 $or: [ 
                     { "name.english": { $regex: searchQuery, $options: 'i' } },
                     { "name.arabic": { $regex: searchQuery, $options: 'i' } }
@@ -233,10 +239,19 @@ router.get('/get/product/for/managementPage', async(req, res) => {
                 ]}
             ).populate('discount').populate('categorie').populate('discountCode'));
 
+        }else if (categorie && !categorie.parentCategorie && searchQuery) {
+
+            products = (await Product.find(
+                {$or: [
+                    {"name.english": {$regex: searchQuery, $options: 'i'}},
+                    {"name.arabic": {$regex: searchQuery, $options: 'i'}}
+                ]}
+            ).populate('discount').populate('categorie').populate('discountCode'));
+
         }else if (categorie?.parentCategorie && !searchQuery) {
 
             products = (await Product.find(
-                {categorie: { $in: categorieId }}
+                {categorie: { $in: categories }}
             ).populate('discount').populate('categorie').populate('discountCode'));
 
         } else {

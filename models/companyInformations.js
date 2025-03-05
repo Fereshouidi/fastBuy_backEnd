@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { type } = require('os');
 
 const ConpanyInformationsShema = new mongoose.Schema({
     name: {
@@ -41,19 +42,42 @@ const ConpanyInformationsShema = new mongoose.Schema({
         default: 0
     },
     Entities: {
-        type: [String]
+        english: {
+            type: String
+        },
+        arabic: {
+            type: String
+        }
     },
     biggestDiscount: {
         type: Number,
     },
     offersDetails: {
-        type: String,
+        english: {
+            type: String
+        },
+        arabic: {
+            type: String
+        }
+    },
+    qualityAssurance: {
+        english: {
+            type: String
+        },
+        arabic: {
+            type: String
+        }
     },
     originalProductsPercentage: {
         type: Number,
     },
     servises: {
-        type: [String]
+        english: {
+            type: String
+        },
+        arabic: {
+            type: String
+        }
     },
     socialMediaLinks: {
 
@@ -76,8 +100,23 @@ const ConpanyInformationsShema = new mongoose.Schema({
             type: String,
         }
     },
-    backgroundOfRegisterPage: {
-        type: String,
+    backgroundsPages: {
+
+        homePage: {
+            type: String,
+        },
+        registerPage: {
+            type: String,
+        },
+        accountPage: {
+            type: String,
+        },
+        ordersPage: {
+            type: String,
+        },
+        shoppingCartPage: {
+            type: String,
+        }
     },
     registerRequiredData: {
         dateOfBearth: {

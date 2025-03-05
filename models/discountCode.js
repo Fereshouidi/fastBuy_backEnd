@@ -6,7 +6,7 @@ const DiscountCodeSchema = new mongoose.Schema({
         required: true,
     },
     target: {
-        type: [String], 
+        type: String, 
         enum: ['shoppingCart', 'product', 'categorie'], 
     },
     categorie: {
@@ -29,7 +29,7 @@ const DiscountCodeSchema = new mongoose.Schema({
         type: Number || null,
         default: null
     },
-    quantity: {
+    numOfUse: {
         type: Number || null,
     },
     createdAt: {

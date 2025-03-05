@@ -16,34 +16,69 @@ router.post('/add/slider', async(req, res) => {
     }
 })
 
+// router.get('/get/slider', async (req, res) => {
+//     try {
+//         const slider = await Slider.find();
+//         if (!slider[0]) {
+//             return res.status(404).json({ error: 'Slider not found' });
+//         }
+
+//         const sliderProducts = await Product.find({ _id: { $in: slider[0].products } });
+
+//         const updatedProducts = await Promise.all(
+//             sliderProducts.map(async (product) => {
+//                 const productObject = product.toObject();
+//                 const productDiscount = await Discount.findOne({ _id: { $in: product.discount } });
+//                 productObject.discount = productDiscount;
+//                 return productObject;
+//             })
+//         );
+
+//         res.status(200).json({
+//             ...slider.toObject(),
+//             products: updatedProducts, 
+//         });
+//     } catch (err) {
+//         console.error(err.message);
+//         res.status(500).json({ error: err.message });
+//     }
+// });
+
 router.get('/get/slider', async (req, res) => {
+
     try {
-        const slider = await Slider.findById('674ce6fccefd08dd4b9b8a6b');
-        if (!slider) {
+        const slider = await Slider.find().populate({
+            path: 'products',
+            populate: 'discount'
+        })
+
+        if (!slider[0]) {
             return res.status(404).json({ error: 'Slider not found' });
         }
 
-        const sliderProducts = await Product.find({ _id: { $in: slider.products } });
+        res.status(200).json(slider[0]);
 
-        const updatedProducts = await Promise.all(
-            sliderProducts.map(async (product) => {
-                const productObject = product.toObject();
-                const productDiscount = await Discount.findOne({ _id: { $in: product.discount } });
-                productObject.discount = productDiscount;
-                return productObject;
-            })
-        );
-
-        res.status(200).json({
-            ...slider.toObject(),
-            products: updatedProducts, 
-        });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({error: err.message})
     }
-});
+})
 
+router.patch('/update/slider', async(req, res) => {
+
+    const updatedSlider = req.body;
+    
+    try{
+        const updatedSlider_ = await Slider.findOneAndUpdate(
+            {},
+            updatedSlider,
+            {new: true}
+        )
+        res.status(200).json({message: 'time updated successfuly !', updatedSlider_});
+    }catch(err){
+        console.log(err);
+        res.status(500).json({error: err.message})
+    }
+})
 
 router.put('/update/slider/tittle', async(req, res) => {
     const {tittle} = req.body;

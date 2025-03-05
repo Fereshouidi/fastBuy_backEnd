@@ -19,7 +19,7 @@ router.post('/add/conpanyInformations', async(req, res) => {
 
 router.get('/get/conpanyInformations', async(req, res) => {
     try{
-        const conpanyInformations = await ConpanyInformations.find();
+        const conpanyInformations = await ConpanyInformations.find().populate('socialMediaLinks');
         console.log(conpanyInformations[0]);
         
         res.status(200).json(conpanyInformations[0]);
@@ -239,6 +239,23 @@ router.get('/get/Profit/ofProduct/allTime', async (req, res) => {
     }
 });
 
+router.patch('/update/conpanyInformations', async(req, res) => {
+
+    const updatedConpanyInformations = req.body;
+
+    try{
+        const updatedConpanyInformations_ = await ConpanyInformations.findOneAndUpdate(
+            {},
+            updatedConpanyInformations,
+            {new: true}
+        );
+        res.status(200).json(updatedConpanyInformations_);
+        
+    }catch(err){
+        console.log(err);
+        res.status(500).json({error: err.message});        
+    }
+})
 
 const getDayEarning = (day, orders) => {
     

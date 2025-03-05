@@ -20,13 +20,13 @@ router.post('/add/categoriesSection', async(req, res) => {
 router.get('/get/categoriesSection', async (req, res) => {
     try {
         const categoriesSection_ = [];
-        const categoriesSection = await CategoriesSection.findById("675601abf7169947cff9f0d1");
+        const categoriesSection = await CategoriesSection.find();
 
-        if (!categoriesSection || !categoriesSection.categoriesList) {
+        if (!categoriesSection[0] || !categoriesSection[0].categoriesList) {
             return res.status(404).json({ error: "Categories section not found" });
         }
 
-        for (const categorieId of categoriesSection.categoriesList) {
+        for (const categorieId of categoriesSection[0].categoriesList) {
             const catgorie = await Categorie.findOne({ _id: categorieId });
 
             const categories = [];
@@ -54,6 +54,47 @@ router.get('/get/categoriesSection', async (req, res) => {
     }
 });
 
+router.get('/get/categoriesSection_', async (req, res) => {
+    try {
+        const categoriesSection = await CategoriesSection.find().populate('categoriesList');
+
+        if (!categoriesSection[0] || !categoriesSection[0].categoriesList) {
+            return res.status(404).json({ error: "Categories section not found" });
+        }
+
+        res.status(200).send(categoriesSection[0].categoriesList);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.put('/update/categoriesSection', async (req, res) => {
+
+    const updatedCategoriesSection = req.body;
+
+    console.log(updatedCategoriesSection);
+    
+
+    try {
+
+        const categoriesSection = await CategoriesSection.findOneAndUpdate(
+            {},
+            { categoriesList: updatedCategoriesSection },
+            { new: true }
+        );
+        
+
+        if (!categoriesSection || !categoriesSection.categoriesList) {
+            return res.status(404).json({ error: "Categories section not found" });
+        }
+
+        res.status(200).send(categoriesSection.categoriesList);
+        
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: err.message });
+    }
+});
 
 
 
