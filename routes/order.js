@@ -6,6 +6,7 @@ const ShoppingCart = require('../models/shoppingCart');
 const Purchase = require('../models/purchase');
 const Customer = require('../models/customer');
 const Product = require('../models/product');
+const DiscountCode = require('../models/discountCode');
 const path = require('path');
 
 router.post('/add/order', async(req, res) => {
@@ -44,6 +45,28 @@ router.post('/add/order', async(req, res) => {
                     $pull: { inPurchases: { $in: orderData.purchases } } 
                 }
             );     
+
+            if (purchase.discountCode) {
+                
+                const discount = await DiscountCode.findById(purchase.discountCode);
+                await DiscountCode.updateOne(
+                    {_id: purchase.discountCode},
+                    { numOfUse: Math.max(discount.numOfUse - 1, 0) }
+                )
+
+            }
+
+        }
+
+        if (orderData.discountCode) {
+            const discount = await DiscountCode.findById(orderData.discountCode);
+        
+            if (discount) {
+                await DiscountCode.updateOne(
+                    { _id: orderData.discountCode },
+                    { numOfUse: Math.max(discount.numOfUse - 1, 0) }
+                );
+            }
         }
         
 
@@ -414,17 +437,38 @@ router.put('/update/order/status', async (req, res) => {
         }
 
         if (updatedOrder.status === 'failed') {
+
             for (const purchase of updatedOrder.purchases) {
+
                 const product = await Product.findOneAndUpdate(
                     { _id: purchase.product._id },
                     { $inc: { quantity: purchase.quantity } },
                     { new: true }
                 );
-                console.log(product);
+
+                if (purchase.discountCode) {
+                
+                    const discount = await DiscountCode.findById(purchase.discountCode);
+                    await DiscountCode.updateOne(
+                        {_id: purchase.discountCode},
+                        { numOfUse: Math.max(discount.numOfUse + 1, 0) }
+                    )
+    
+                }
                 
             }
         }
         
+        if (updatedOrder.discountCode) {
+            const discount = await DiscountCode.findById(updatedOrder.discountCode);
+        
+            if (discount) {
+                await DiscountCode.updateOne(
+                    { _id: updatedOrder.discountCode },
+                    { numOfUse: Math.max(discount.numOfUse + 1, 0) }
+                );
+            }
+        }
 
         await Promise.all(
             order.purchases.map(async (purchase) => {

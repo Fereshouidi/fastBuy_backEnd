@@ -5,6 +5,10 @@ const DiscountCodeSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    name:{
+        type: String,
+        default: ''
+    },
     target: {
         type: String, 
         enum: ['shoppingCart', 'product', 'categorie'], 

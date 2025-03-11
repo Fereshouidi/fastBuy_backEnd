@@ -20,7 +20,6 @@ router.post('/add/conpanyInformations', async(req, res) => {
 router.get('/get/conpanyInformations', async(req, res) => {
     try{
         const conpanyInformations = await ConpanyInformations.find().populate('socialMediaLinks');
-        console.log(conpanyInformations[0]);
         
         res.status(200).json(conpanyInformations[0]);
         
@@ -107,14 +106,48 @@ router.get('/get/Profit/lasMonth', async(req, res) => {
         const week3_Profits = getWeekEarnings(week3Start, ordersLastMonth);
         const week4_Profits = getWeekEarnings(week4Start, ordersLastMonth);
 
-        //console.log(new Date(dayForCheck.setDate(getLastMonth().lastMonthStart.getDate() +14)));
-        //console.log(week1_Profits.day, week2_Profits.day, week4_Profits.day);
-        console.log(today);
-        
                 
         res.status(200).json([
             week1_Profits, week2_Profits, week3_Profits, week4_Profits
         ])
+        
+    }catch(err){
+        res.status(500).json({error: err.message});
+        console.log(err);
+        
+    }
+})
+
+router.get('/get/Profit/all', async(req, res) => {
+    
+    try{
+
+        const allOrders = await Order.find({ status: 'delivered' });
+        let startedTime = null;
+        const today = new Date();
+
+        if (allOrders.length > 0) {
+            startedTime = new Date(allOrders.reduce((earliest, order) => 
+                order.createdAt < earliest.createdAt ? order : earliest
+            ).createdAt);
+        }
+            
+        const duration = new Date(today.getTime() - startedTime.getTime());
+
+        const interval = duration / 7; 
+        
+        let earningsByDays = [];
+        
+        for (let i = 0; i < 7; i++) {
+            const durationStart_ = new Date(startedTime.getTime() + i * interval);
+            const durationEnd_ = new Date(startedTime.getTime() + (i + 1) * interval);
+        
+            const earnings = getEarningsByDuration(durationStart_, durationEnd_, allOrders);
+            earningsByDays.push(earnings);
+        }
+
+        res.status(200).json(earningsByDays);
+        
         
     }catch(err){
         res.status(500).json({error: err.message});
@@ -148,7 +181,6 @@ router.get('/get/Profit/ofProduct/lastWeek', async(req, res) => {
                 }
             })
         })
-        console.log( purchases.length );
 
         const getDayEarning_ = (day, purchase) => {
 
@@ -170,7 +202,6 @@ router.get('/get/Profit/ofProduct/lastWeek', async(req, res) => {
             
             return {totalEarning, day};
         };
-        console.log(new Date(dayForCheck.setDate(today.getDate() - 7)), purchases);
 
         const day1_Pprofits = getDayEarning_(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7), purchases);
         const day2_Pprofits = getDayEarning_(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6), purchases);
@@ -229,7 +260,7 @@ router.get('/get/Profit/ofProduct/allTime', async (req, res) => {
             ];
         };
 
-        const profits = getWeeklyEarnings(purchases);
+        const profits = getWeeklyEarnings(purchases);        
 
         res.status(200).json(profits);
 
@@ -293,7 +324,6 @@ const getWeekEarnings = (weekStart_, orders) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    //console.log(weekStart_);
     const weekStart = new Date(weekStart_);
     const weekEnd = new Date(weekStart_.setDate(weekStart_.getDate() +7));
 
@@ -354,5 +384,20 @@ const getLastMonth = () => {
 
     return {lastMonthStart, lastMonthEnd}
 }
+
+const getEarningsByDuration = (durationStart_, durationEnd_, orders) => {  
+    const filteredOrders = orders.filter(order => 
+        order.createdAt >= durationStart_ && order.createdAt <= durationEnd_
+    );
+
+    const totalEarnings = filteredOrders.reduce((sum, order) => sum + order.totalPrice, 0);
+
+    return { 
+        day: durationEnd_,
+        totalEarning: totalEarnings, 
+    }; 
+};
+
+
 
 module.exports = router;

@@ -54,7 +54,8 @@ const ProductShema = new mongoose.Schema({
         ref: 'discounts',
     },
     discountCode: {
-        type: mongoose.Schema.Types.ObjectId || null,
+        type: mongoose.Schema.Types.ObjectId,
+        default: null,
         ref: 'discountCodes',
     },
     inPurchases: {

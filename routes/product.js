@@ -6,8 +6,9 @@ const Review = require('../models/reviews');
 const Discount = require('../models/discount');
 const Categorie = require('../models/categorie');
 const Customer = require('../models/customer');
-const { propfind } = require('./customer');
-// import { uploadImg } from '../DealingWithImages';
+const Order = require('../models/order');
+const Purchase = require('../models/purchase');
+
 
 router.post('/add/Product', async(req, res) => {
     const productData = req.body;
@@ -51,6 +52,90 @@ router.get('/get/product/byId', async(req, res) => {
         res.status(500).json({error: err.message});
     }
 })
+
+router.get('/get/top5BestSellingProducts', async (req, res) => {
+
+    try {
+
+        const allProducts = await Product.find({visible: true});
+
+        const productSales = await Promise.all(
+            allProducts.map(async (product) => {
+                const purchases = await Purchase.find({
+                    product: product._id,
+                    status: 'delivered'
+                });
+        
+                const totalSold = purchases.reduce((sum, purchase) => sum + purchase.quantity, 0);
+                const totalProfit = purchases.reduce((sum, purchase) => sum + purchase.totalPrice, 0);
+        
+                return {
+                    product,
+                    totalSold,
+                    totalProfit
+                };
+            })
+        );
+        
+        const top10BestSellingProducts = productSales
+            .sort((a, b) => b.totalSold - a.totalSold) 
+            .slice(0, 5);
+        
+                
+        res.status(200).json(top10BestSellingProducts);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log(err);
+        
+    }
+});
+
+router.get('/get/least5SellingProducts', async (req, res) => {
+    try {
+        const allProducts = await Product.find({visible: true});
+
+        const productSales = await Promise.all(
+            allProducts.map(async (product) => {
+                const purchases = await Purchase.find({
+                    product: product._id,
+                    status: 'delivered'
+                });
+
+                const totalSold = purchases.reduce((sum, purchase) => sum + purchase.quantity, 0);
+                const totalProfit = purchases.reduce((sum, purchase) => sum + purchase.totalPrice, 0);
+
+                return {
+                    product,
+                    totalSold,
+                    totalProfit
+                };
+            })
+        );
+
+        const least5SellingProducts = productSales
+            .sort((a, b) => a.totalSold - b.totalSold)
+            .slice(0, 5);
+
+        res.status(200).json(least5SellingProducts);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log(err);
+    }
+});
+
+router.get('/get/top5LowestStock', async (req, res) => {
+    try {
+        const top5LowestStock = await Product.find({ visible: true })
+            .sort({ quantity: 1 })
+            .limit(5);
+
+        res.status(200).json(top5LowestStock);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log(err);
+    }
+});
+
 
 router.get('/get/product/by/biggestDiscount', async(req, res) => {
     try{

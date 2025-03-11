@@ -35,9 +35,26 @@ router.get('/get/all/discountCodes', async(req, res) => {
 
     try{
         const discountCodes = await DiscountCode.find();
-        res.status(201).json(discountCodes);
+        res.status(200).json(discountCodes);
 
     }catch(err){
+        res.status(500).json({error: err.message});
+    }
+})
+
+router.get('/get/discountCode/byId/:id', async(req, res) => {
+
+    const {id} = req.params;
+
+    try{
+        const discountCode = await DiscountCode.findById(id);
+
+        console.log(discountCode);
+        
+        res.status(200).json(discountCode);
+
+    }catch(err){
+        // console.log(err);
         res.status(500).json({error: err.message});
     }
 })
