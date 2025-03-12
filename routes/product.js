@@ -12,13 +12,18 @@ const Purchase = require('../models/purchase');
 
 router.post('/add/Product', async(req, res) => {
     const productData = req.body;
+
+    console.log(productData);
+    
     
     try{
         const newProduct = await new Product(productData);
         await newProduct.save();
         res.status(201).json(newProduct);
     }catch(err){
-        res.status(500).json({error: err.message});        
+        res.status(500).json({error: err.message});   
+        console.log(err);
+             
     }
 })
 

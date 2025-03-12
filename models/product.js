@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { type } = require('os');
 const { availableMemory } = require('process');
+const Categorie = require('./categorie');
 
 const ProductShema = new mongoose.Schema({
     name: {
@@ -39,7 +40,6 @@ const ProductShema = new mongoose.Schema({
     },
     categorie: {
         type: mongoose.Schema.Types.ObjectId,
-        default: 'categories',
         ref: 'categories',
     },
     images: {
@@ -90,6 +90,15 @@ const ProductShema = new mongoose.Schema({
         default: Date.now,
     }
     
+});
+
+ProductShema.pre('save', async function(next) {
+
+    if (!this.categorie) {
+        const defaultCategorie = await Categorie.findOne({ parentCategorie: null });
+        this.categorie = defaultCategorie ? defaultCategorie._id : null;
+    }
+    next();
 });
 
 const Product = mongoose.model('products', ProductShema);
