@@ -104,6 +104,8 @@ const addeview = async (customerId, productId, customerRating, customerNote) => 
     if (!customerNote) {
         return {status: 400, message: 'customerNote is necessery !'}
     }
+    console.log(customerRating);
+
     const newReview = new Review({
         customer: customerId,
         product: productId,
@@ -111,7 +113,13 @@ const addeview = async (customerId, productId, customerRating, customerNote) => 
         customerNote: customerNote,        
 
     });
+
+    console.log(newReview);
+    
     await newReview.save(); 
+
+    console.log(newReview);
+
 
     const product = await Product.findById(productId);
 
@@ -163,21 +171,24 @@ const updateReview = async (reviewId, customerRating, customerNote) => {
         return {status: 404}
     }
 
+    
     if (product.evaluators.includes(updatedReview.customer)) {
 
         product.totalRatingSum -= review.customerRating ;
-        product.totalRatingSum += customerRating;
-        product.totalRating = product.totalRatingSum / product.evaluators.length;
+        product.totalRatingSum += (customerRating || 0); 
+        product.totalRating = product.totalRatingSum / (product.evaluators.length || 1);
     
+
         await product.save();
         return {status: 200, updatedReview}
 
         
     } else {
 
-        product.totalRatingSum += customerRating; 
+        product.totalRatingSum += (customerRating || 0); 
         product.evaluators.push(updatedReview.customer); 
-        product.totalRating = product.totalRatingSum / product.evaluators.length;
+        product.totalRating = product.totalRatingSum / (product.evaluators.length || 1);
+        console.log('--------------tm------------');
 
         await product.save();
         return {status: 200, updatedReview}

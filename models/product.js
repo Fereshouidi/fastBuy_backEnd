@@ -71,6 +71,7 @@ const ProductShema = new mongoose.Schema({
         ref: 'reviews'
     },
     totalRatingSum:  {
+        default: 0,
         type: Number,
     },
     totalRating: {

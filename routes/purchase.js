@@ -290,10 +290,8 @@ router.get('/get/purchases/by/buyer', async(req, res) => {
             buyer: customerId,
             status: 'delivered'
 
-        }).populate('discountCode').populate('buyer')
-        
-        console.log(purchases);
-        
+        }).populate('discountCode').populate('buyer').populate('product');
+                
         res.status(200).json(purchases);
     }catch{
         res.status(500).json({error: err});
@@ -309,7 +307,7 @@ router.get('/get/purchases/by/product', async(req, res) => {
             product: productId,
             status: 'inShoppingCart'
 
-        }).populate('discountCode').populate('buyer')
+        }).populate('discountCode').populate('buyer').populate('product');
         
         console.log(purchases);
         
@@ -328,7 +326,7 @@ router.get('/get/delivered/purchases/by/product', async(req, res) => {
             product: productId,
             status: 'delivered'
 
-        }).populate('discountCode').populate('buyer');
+        }).populate('discountCode').populate('buyer').populate('product');
 
         const purchases_ = await Promise.all(
             purchases.map(async (purchase) => {
@@ -439,7 +437,7 @@ router.put('/update/purchase', async (req, res) => {
             { _id: updatedPurchase._id },
             updatedPurchase,
             { new: true }
-        ).populate('discountCode');
+        ).populate('discountCode').populate('buyer').populate('product');
 
         if (!updatedPurchaseResult.shoppingCart) {
             return res.status(210).json({ message: 'No shopping cart associated with the purchase.' });
@@ -556,85 +554,6 @@ router.put('/update/likeStatus', async(req, res) => {
         
     }
 });
-
-// router.put('/update/review', async (req, res) => {
-//     const { purchaseId, customerRating, customerNote } = req.body;    
-
-//     if (!purchaseId) {
-//         return res.status(400).json({ error: 'purchaseId is required!' });
-//     }
-
-//     if (!customerRating || customerRating < 0.5 || customerRating > 5) {
-//         return res.status(400).json({ error: 'Rating must be between 1 and 5!' });
-//     }
-
-//     try {
-//         const purchase = await Purchase.findOne({ _id: purchaseId });
-
-//         const updatedPurchase = await Purchase.findOneAndUpdate(
-//             { _id: purchaseId },
-//             { customerRating, customerNote },
-//             { new: true }
-//         );
-
-//         if (!updatedPurchase) {
-//             return res.status(404).json({ error: 'Purchase not found!' });
-//         }
-
-//         const product = await Product.findById(updatedPurchase.product);
-
-//         if (!product) {
-//             return res.status(404).json({ error: 'Product not found!' });
-//         }
-
-//         if (product.evaluators.includes(updatedPurchase.buyer)) {
-
-//             product.totalRatingSum -= purchase.customerRating ;
-//             product.totalRatingSum += customerRating;
-//             product.totalRating = product.totalRatingSum / product.evaluators.length;
-        
-//             await product.save();
-        
-
-//             res.status(200).json({
-//                 message: 'review has been updated successfully.',
-//                 updatedPurchase,
-//                 product: {
-//                     id: product._id,
-//                     totalRatingSum: product.totalRatingSum,
-//                     evaluators: product.evaluators.length,
-//                     totalRating: product.totalRating.toFixed(2),
-//                 },
-//             }); 
-//             console.log('review has been updated successfully.');
-            
-//         } else {
-
-//             product.totalRatingSum += customerRating; 
-//             product.evaluators.push(updatedPurchase.buyer); 
-//             product.totalRating = product.totalRatingSum / product.evaluators.length;
-
-//             await product.save();
-
-//             res.status(200).json({
-//                 message: 'review has been added successfully.',
-//                 updatedPurchase,
-//                 product: {
-//                     id: product._id,
-//                     totalRatingSum: product.totalRatingSum,
-//                     evaluators: product.evaluators.length,
-//                     totalRating: product.totalRating.toFixed(2),
-//                 },
-//             });
-//             console.log('review has been added successfully.');
-
-//         }
-//     } catch (err) {
-//         console.error('Error updating review:', err);
-//         res.status(500).json({ error: 'An error occurred while updating the review.' });
-//     }
-// });
-
 
 
 

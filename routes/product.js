@@ -11,10 +11,7 @@ const Purchase = require('../models/purchase');
 
 
 router.post('/add/Product', async(req, res) => {
-    const productData = req.body;
-
-    console.log(productData);
-    
+    const productData = req.body;    
     
     try{
         const newProduct = await new Product(productData);
@@ -162,13 +159,43 @@ router.get('/get/product/by/biggestDiscount', async(req, res) => {
 })
 
 router.get('/get/products/byRating', async (req, res) => {
-    const {page, limit} = req.query;
-    const skip = (page - 1) * limit;
     try {
-        const allProducts_ = await Product.find().sort({ totalRating: -1 }).limit(parseInt(limit)).skip(parseInt(skip)).populate('discount');
-        const allProducts = allProducts_.filter((product) => product.visible !== false);
+        const page = parseInt(req.query.page) || 1;
+        let limit = parseInt(req.query.limit) || 10;
 
-        res.status(200).json(allProducts);
+        console.log(page, limit);
+        
+        const maxLimit = 100;
+        limit = Math.min(limit, maxLimit);
+
+        if (page < 1) {
+            return res.status(400).json({ error: "Page must be at least 1" });
+        }
+
+        const skip = (page - 1) * limit;
+
+        const [totalProducts, allProducts] = await Promise.all([
+            Product.countDocuments({ visible: true }),
+            Product.find({ visible: true })
+            .sort({ totalRating: -1, _id: 1 })
+            .skip(skip)
+                .limit(limit)
+                .populate('discount')
+        ]);
+
+        res.status(200).json({
+            products: allProducts,
+            totalPages: Math.ceil(totalProducts / limit),
+            currentPage: page
+        });
+
+        if (allProducts.some(product => product.name.english == "Classic Denim Jacket")) {
+            console.log("yes");
+            
+        } else {
+            console.log('no');
+            
+        }
 
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -205,7 +232,6 @@ router.get('/get/products/by/name', async (req, res) => {
 
 router.put('/update/product', async (req, res) => {
     const { updatedProduct } = req.body;
-    console.log(updatedProduct);
     
 
     if (!updatedProduct || !updatedProduct._id) {
